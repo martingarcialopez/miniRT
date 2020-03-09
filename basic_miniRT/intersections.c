@@ -6,29 +6,29 @@
 /*   By: mgarcia- <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/02/10 13:02:52 by mgarcia-          #+#    #+#             */
-/*   Updated: 2020/02/13 08:58:43 by mgarcia-         ###   ########.fr       */
+/*   Updated: 2020/03/09 23:48:11 by mgarcia-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "miniRT.h"
 
-double		plane_intersection(t_p3 O, t_p3 d, t_figures *lst)
+double		plane_intersection(t_p3 o, t_p3 d, t_p3 plane_p, t_p3 plane_nv)
 {
 	double	x;
 	double	denom;
 
-	denom  = dot(lst->fig.pl.nv, d/*menos origen*/);
+	denom  = dot(plane_nv, d);
 
 	if (denom == 0)
 		return (INFINITY);
 
 	//x = (dot(lst->fig.pl.nv, lst->fig.pl.p) - dot(lst->fig.pl.nv, d)) / denom;
-	x = (dot(lst->fig.pl.nv, substract_vectors(lst->fig.pl.p, O))) / denom;
+	x = (dot(plane_nv, substract_vectors(plane_p, o))) / denom;
 
 	return (x > 0 ? x : INFINITY);
 }
 
-double		sphere_intersection(t_p3 O, t_p3 d, t_figures *lst)
+double		sphere_intersection(t_p3 o, t_p3 d, t_figures *lst)
 {
 	//return type int, 1 si corta loksea y 0 si no corta ni bakalaoo
 	double	disc;
@@ -39,7 +39,7 @@ double		sphere_intersection(t_p3 O, t_p3 d, t_figures *lst)
 	double	x1;
 	double	x2;
 
-	oc = substract_vectors(O, lst->fig.sp.c);
+	oc = substract_vectors(o, lst->fig.sp.c);
 	k1 = dot(d, d);
 	k2 = 2 * dot(d, oc);
 	k3 = dot(oc, oc) - lst->fig.sp.r * lst->fig.sp.r;
@@ -56,4 +56,9 @@ double		sphere_intersection(t_p3 O, t_p3 d, t_figures *lst)
 		return (x1);
 	else
 		return (x1 < x2 ? x1 : x2);
+}
+
+double		square_intersection(t_p3 o, t_p3 d, t_figures *lst)
+{
+	
 }

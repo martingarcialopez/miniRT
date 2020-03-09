@@ -6,7 +6,7 @@
 /*   By: mgarcia- <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/01/21 10:48:18 by mgarcia-          #+#    #+#             */
-/*   Updated: 2020/03/03 11:51:57 by mgarcia-         ###   ########.fr       */
+/*   Updated: 2020/03/09 22:19:07 by mgarcia-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,7 +46,7 @@ typedef struct	s_square
 {
 	t_p3	c;
 	t_p3	nv;
-	double	size;
+	double	side;
 
 }				t_square;
 

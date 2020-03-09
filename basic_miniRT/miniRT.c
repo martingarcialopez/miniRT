@@ -6,7 +6,7 @@
 /*   By: mgarcia- <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/01/20 08:39:55 by mgarcia-          #+#    #+#             */
-/*   Updated: 2020/03/09 11:28:49 by mgarcia-         ###   ########.fr       */
+/*   Updated: 2020/03/09 23:48:37 by mgarcia-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,20 +14,20 @@
 
 t_p3		define_vector(int i, int j, t_scene data)
 {
-	double	ImgAspRatio;
+	double	img_asp_ratio;
 	double	correct_fov;
 	t_p3	p;
 
-	ImgAspRatio = (double)data.xres / (double)data.yres;
+	img_asp_ratio = (double)data.xres / (double)data.yres;
 	correct_fov = tan((data.cam->fov * PI / 180) / 2);
-	p.x = ((2 * ((i + 0.5) / data.xres)) - 1) * ImgAspRatio * correct_fov;
+	p.x = ((2 * ((i + 0.5) / data.xres)) - 1) * img_asp_ratio * correct_fov;
 	p.y = (1 - (2 * ((j + 0.5) / data.yres))) * correct_fov;
 	p.z = -1;
-	//normalize(p);
+	normalize(p);
 	return (p);
 }
 
-t_p3	LookAt(t_p3 d, t_p3 cam_nv, t_p3 cam)
+t_p3		look_at(t_p3 d, t_p3 cam_nv, t_p3 cam)
 {
 	t_p3	x_axis;
 	t_p3	y_axis;
@@ -35,17 +35,13 @@ t_p3	LookAt(t_p3 d, t_p3 cam_nv, t_p3 cam)
 	t_p3	tmp;
 	t_p3	rotated;
 
-	tmp.x = 0;
-	tmp.y = 1;
-	tmp.z = 0;
-
-	z_axis = normalize(cam_nv);
-	//printf("z_axis iss %f, %f, %f\n", z_axis.x, z_axis.y, z_axis.z);
-	x_axis = cross_product(tmp, z_axis);
-	//printf("x_axis iss %d, %d, %d\n", x_axis.x, x_axis.y, x_axis.z);
+	tmp = define_vect(0, 1, 0);
+	z_axis = cam_nv;
+	if (cam_nv.y == 1 || cam_nv.y == -1)
+		x_axis = define_vect(1, 0, 0);
+	else
+		x_axis = cross_product(tmp, z_axis);
 	y_axis = cross_product(z_axis, x_axis);
-	//printf("y_axis iss %f, %f, %f\n", y_axis.x, y_axis.y, y_axis.z);
-
 	rotated.x = d.x * x_axis.x + d.y * x_axis.y + d.z * x_axis.z;
 	rotated.y = d.x * y_axis.x + d.y * y_axis.y + d.z * y_axis.z;
 	rotated.z = d.x * z_axis.x + d.y * z_axis.y + d.z * z_axis.z;
@@ -53,24 +49,25 @@ t_p3	LookAt(t_p3 d, t_p3 cam_nv, t_p3 cam)
 	return (rotated);
 }
 
-
-void	try_all_intersections(t_p3 O, t_p3 d, double min, double max, t_figures *lst, t_figures *closest_figure, double *closest_intersection)
+void	try_all_intersections(t_p3 o, t_p3 d, double min, double max,
+		t_figures *lst, t_figures *closest_figure, double *closest_intersection)
 {
 	double	intersection_distance;
 
 	while (lst)
 	{
 		if (lst->flag & SP)
-			intersection_distance = sphere_intersection(O, d, lst);
+			intersection_distance = sphere_intersection(o, d, lst);
 		else if (lst->flag & PL)
-			intersection_distance = plane_intersection(O, d, lst);
-	/*	else if (lst->flag & SQ)
-			intersection_distance = square_intersection;
-		else if (lst->flag & CY)
+			intersection_distance = plane_intersection(o, d, lst->fig.pl.o, lst->fig.pl.nv);
+	//	else if (lst->flag & SQ)
+	//		intersection_distance = square_intersection;
+	/*	else if (lst->flag & CY)
 			intersection_distance = cylinder_intersection;
 		else if (lst->flag & TR)
 			intersection_distance = triangle_intersection;*/
-		if (intersection_distance > min && intersection_distance < *closest_intersection)
+		if (intersection_distance > min
+				&& intersection_distance < *closest_intersection)
 		{
 			*closest_figure = *lst;
 			*closest_intersection = intersection_distance;
@@ -79,33 +76,32 @@ void	try_all_intersections(t_p3 O, t_p3 d, double min, double max, t_figures *ls
 	}
 }
 
-int	trace_ray(t_p3 O, t_p3 d, double min, t_scene data, t_figures *lst)
+int	trace_ray(t_p3 o, t_p3 d, double min, t_scene data, t_figures *lst)
 {
-	int		color;
 	t_figures	closest_figure;
-	double	closest_intersection;
-	t_p3	normal;
-	t_p3	intersection_point;
+	double		closest_intersection;
+	t_p3		normal;
+	t_p3		intersection_point;
+	int			color;
 
-	data.background = 0x000000;
 	color = 0x000000;
-
+	data.background = 0x202020;
 	closest_intersection = INFINITY;
 	closest_figure.flag = 0;
-	try_all_intersections(O, d, min, INFINITY, lst, &closest_figure, &closest_intersection);
+	try_all_intersections(o, d, min, INFINITY, lst, &closest_figure, &closest_intersection);
 	color = closest_figure.flag != 0 ? closest_figure.color : data.background;
-	intersection_point = add_vectors(O, scal_x_vec(closest_intersection, normalize(d)));
+	intersection_point = add_vectors(o, scal_x_vec(closest_intersection, normalize(d)));
 	normal = calc_normal(intersection_point, closest_figure);
-	color = color_x_light(color, compute_light(intersection_point, normal, data, lst));
-    return (color);
-
+	//color = color_x_light(color, compute_light(intersection_point, normal, data, lst));
+	compute_light(&color, intersection_point, normal, data, lst);
+	return (color);
 }
 
-void	render_scene(t_scene data, t_figures *lst)
+void	render_scene(t_scene data, t_figures *lst, t_minilibx mlx)
 {
-	t_p3		d;
-	int 		i;
-	int 		j;
+	t_p3	d;
+	int		i;
+	int		j;
 	int		color;
 
 	j = 0;
@@ -116,7 +112,7 @@ void	render_scene(t_scene data, t_figures *lst)
 		{
 			d = define_vector(i, j, data);
 			//printf("for x %d and y %d the vector d is %f, %f, %f\n", i, j, d.x, d.y, d.z);
-			d = LookAt(d, data.cam->vec, data.cam->o);	
+			d = look_at(d, data.cam->vec, data.cam->o);	
 			//puts("After LookAt function");
 			//printf("for x %d and y %d the vector d is %f, %f, %f\n", i, j, d.x, d.y, d.z);
 			//puts("\n");
@@ -169,22 +165,20 @@ int			main(int ac, char **av)
 {
 	t_minilibx	mlx;
 	t_scene		data;
- 	t_figures	*lst;
-	
+	t_figures	*lst;
+
 	parse_scene(&data, &lst, ac, av);
 	init_mlx(&mlx, &data);
 	while (data.cam->next)
 	{
-		render_scene(data, lst);
+		render_scene(data, lst, mlx);
 		data.cam = data.cam->next;
 	}
-	render_scene(data, lst);
+	render_scene(data, lst, mlx);
 	data.cam = data.cam->begin;
-
 	mlx_put_image_to_window (mlx.mlx_ptr, mlx.win_ptr, data.cam->img_ptr, 0, 0);
 	mlx_hook(mlx.win_ptr, 17, 1L << 17, exit, (void*)0);
 	mlx_hook(mlx.win_ptr, 2, 0, next_cam, &data);
 	mlx_loop(mlx.mlx_ptr);
-
 	return (0);
 }

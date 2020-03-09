@@ -6,11 +6,21 @@
 /*   By: mgarcia- <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/01/20 13:29:36 by mgarcia-          #+#    #+#             */
-/*   Updated: 2020/03/03 13:35:04 by mgarcia-         ###   ########.fr       */
+/*   Updated: 2020/03/09 23:46:07 by mgarcia-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "miniRT.h"
+
+t_p3		define_vect(double x, double y, double z)
+{
+	t_p3	vector;
+
+	vector.x = x;
+	vector.y = y;
+	vector.z = z;
+	return (vector);
+}
 
 t_p3		cross_product(t_p3 a, t_p3 b)
 {

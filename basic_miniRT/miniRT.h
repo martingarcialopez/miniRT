@@ -6,7 +6,7 @@
 /*   By: mgarcia- <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/01/20 08:42:41 by mgarcia-          #+#    #+#             */
-/*   Updated: 2020/03/09 09:52:46 by mgarcia-         ###   ########.fr       */
+/*   Updated: 2020/03/09 23:49:49 by mgarcia-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,56 +30,56 @@
 
 typedef struct		s_camera
 {
-    t_p3		o;
-    t_p3		vec;
-    int			fov;
-    void		*mlx_ptr;
-	void		*win_ptr;
-	void		*img_ptr;
-    int			*px_img;
+    t_p3			o;
+    t_p3			vec;
+    int				fov;
+    void			*mlx_ptr;
+	void			*win_ptr;
+	void			*img_ptr;
+    int				*px_img;
 	struct s_camera	*begin;
     struct s_camera	*next;
 }			t_camera;
 
 typedef struct		s_light
 {
-	t_p3		o;
-	double		br;
-	int		color;
+	t_p3			o;
+	double			br;
+	int				color;
 	struct s_light	*next;
-}			t_light;
+}					t_light;
 
 typedef struct		s_scene
 {
-	int		xres;
-	int		yres;
-	t_camera	*cam;
-	t_light		*l;
-	double		ambient_light;
-	int		al_color;
-	int		background;
-}			t_scene;
+	int				xres;
+	int				yres;
+	t_camera		*cam;
+	t_light			*l;
+	double			ambient_light;
+	int				al_color;
+	int				background;
+}					t_scene;
 
 t_p3			normalize(t_p3 p);
 
 typedef struct		s_figures
 {
-	int		flag;
+	int				flag;
 	union figures	fig;
-	int		color;
+	int				color;
 	struct s_figures*next;
-}			t_figures;
+}					t_figures;
 
 typedef struct		s_minilibx
 {
-	void		*mlx_ptr;
-	void		*win_ptr;
-	void		*img_ptr;
-	int		bits_per_pixel;
-	int		size_line;
-	int		endian;
-	int		*pixel_tab;
-}			t_minilibx;
+	void			*mlx_ptr;
+	void			*win_ptr;
+	void			*img_ptr;
+	int				bits_per_pixel;
+	int				size_line;
+	int				endian;
+	int				*pixel_tab;
+}					t_minilibx;
 
 double 			dot(t_p3 a, t_p3 b);
 
@@ -95,11 +95,11 @@ void			parse_scene(t_scene *data, t_figures **lst, int ac, char **av);
 
 double			sphere_intersection(t_p3 O, t_p3 d, t_figures *lst);
 
-double			plane_intersection(t_p3 O, t_p3 d, t_figures *lst);
+double			plane_intersection(t_p3 O, t_p3 d, t_p3 plane_p, t_p3 plane_nv);
 
-double			compute_light(t_p3 p, t_p3 normal, t_scene data, t_figures *lst);
+void			compute_light(int *color, t_p3 p, t_p3 normal, t_scene data, t_figures *lst);
 
-int 			color_x_light(int color, double light);
+int 			color_x_light(int color, double rgb[3]);
 
 t_p3			calc_normal(t_p3 p, t_figures lst);
 
@@ -111,5 +111,6 @@ t_p3			cross_product(t_p3 a, t_p3 b);
 
 t_p3			reflect_ray(t_p3 ray, t_p3 normal);
 
+t_p3			define_vect(double x, double y, double z);
 
 #endif

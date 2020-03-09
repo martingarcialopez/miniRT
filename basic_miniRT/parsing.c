@@ -6,7 +6,7 @@
 /*   By: mgarcia- <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/01/21 11:31:29 by mgarcia-          #+#    #+#             */
-/*   Updated: 2020/03/09 09:54:54 by mgarcia-         ###   ########.fr       */
+/*   Updated: 2020/03/09 23:46:22 by mgarcia-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -308,7 +308,7 @@ void		parse_square(t_scene *data, t_figures **elem, t_figures **begin, char **st
 	comma(str);
 	lst->fig.sq.nv.z = stof(str);
 	next(str);
-	lst->fig.sq.size = stof(str);
+	lst->fig.sq.side = stof(str);
 	next(str);
 	lst->color |= stoi(str) << 16;
 	comma(str);
