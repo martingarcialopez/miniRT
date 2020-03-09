@@ -6,7 +6,7 @@
 /*   By: mgarcia- <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/01/21 11:31:29 by mgarcia-          #+#    #+#             */
-/*   Updated: 2020/03/03 10:38:10 by mgarcia-         ###   ########.fr       */
+/*   Updated: 2020/03/09 09:54:54 by mgarcia-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -139,23 +139,44 @@ void		parse_ambient_light(t_scene *data, char **str)
 
 void		parse_camera(t_scene *data, char **str)
 {
-	data->cam = (t_camera *)malloc(sizeof(t_camera));
-	data->cam->next = NULL;
+	t_camera	*elem;
+	t_camera	*list;
+	t_camera	*begin;
 
+	begin = data->cam;
+	list = data->cam;
+	if (!(elem = malloc(sizeof(t_camera))))
+		exit (1);
+	elem->next = NULL;
+	if (list)
+	{
+		while (list->next)
+			list = list->next;
+		list->next = elem;
+	}
+	else
+	{
+		list = elem;
+		begin = elem;
+	}
+	
 	next(str);
-	data->cam->o.x = stof(str);
+	elem->o.x = stof(str);
 	comma(str);
-	data->cam->o.y = stof(str);
+	elem->o.y = stof(str);
 	comma(str);
-	data->cam->o.z = stof(str);
+	elem->o.z = stof(str);
 	next(str);
-	data->cam->vec.x = stof(str);
+	elem->vec.x = stof(str);
 	comma(str);
-	data->cam->vec.y = stof(str);
+	elem->vec.y = stof(str);
 	comma(str);
-	data->cam->vec.z = stof(str);
+	elem->vec.z = stof(str);
 	next(str);
-	data->cam->fov = stoi(str);
+	elem->fov = stoi(str);
+
+
+	data->cam = begin;
 }
 
 void		parse_cylinder(t_scene *data, t_figures **elem, t_figures **begin, char **str)
@@ -377,6 +398,7 @@ void	parse_scene(t_scene *data, t_figures **lst, int ac, char **av)
 	}
 	*lst = NULL;
 	data->l = NULL;
+	data->cam = NULL;
 	str = (char *)malloc(sizeof(char) * (BUFSIZE + 1));
 	fd = open(av[1], 0);
 	str = readfile(str, fd);

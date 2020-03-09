@@ -6,7 +6,7 @@
 /*   By: mgarcia- <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/01/20 08:42:41 by mgarcia-          #+#    #+#             */
-/*   Updated: 2020/03/03 11:57:08 by mgarcia-         ###   ########.fr       */
+/*   Updated: 2020/03/09 09:52:46 by mgarcia-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,8 +33,11 @@ typedef struct		s_camera
     t_p3		o;
     t_p3		vec;
     int			fov;
-    void		*img_ptr;
+    void		*mlx_ptr;
+	void		*win_ptr;
+	void		*img_ptr;
     int			*px_img;
+	struct s_camera	*begin;
     struct s_camera	*next;
 }			t_camera;
 
@@ -88,7 +91,7 @@ t_p3			add_vectors(t_p3 a, t_p3 b);
 
 t_p3			substract_vectors(t_p3 a, t_p3 b);
 
-//void			parse_scene(t_scn *data, t_lst **lst, int ac, char **av);
+void			parse_scene(t_scene *data, t_figures **lst, int ac, char **av);
 
 double			sphere_intersection(t_p3 O, t_p3 d, t_figures *lst);
 
@@ -102,7 +105,7 @@ t_p3			calc_normal(t_p3 p, t_figures lst);
 
 double			distance(t_p3 p1, t_p3 p2);
 
-int			is_lit(t_p3 O, t_p3 d, t_figures *lst);
+int				is_lit(t_p3 O, t_p3 d, t_figures *lst);
 
 t_p3			cross_product(t_p3 a, t_p3 b);
 

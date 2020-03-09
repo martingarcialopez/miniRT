@@ -6,7 +6,7 @@
 /*   By: mgarcia- <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/01/20 08:39:55 by mgarcia-          #+#    #+#             */
-/*   Updated: 2020/03/03 13:35:03 by mgarcia-         ###   ########.fr       */
+/*   Updated: 2020/03/09 11:28:49 by mgarcia-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -81,25 +81,22 @@ void	try_all_intersections(t_p3 O, t_p3 d, double min, double max, t_figures *ls
 
 int	trace_ray(t_p3 O, t_p3 d, double min, t_scene data, t_figures *lst)
 {
-    int		color;
-    t_figures	closest_figure;
-    double	closest_intersection;
-    t_p3	normal;
-    t_p3	intersection_point;
+	int		color;
+	t_figures	closest_figure;
+	double	closest_intersection;
+	t_p3	normal;
+	t_p3	intersection_point;
 
-    data.background = 0x000000;
-    color = 0x000000;
+	data.background = 0x000000;
+	color = 0x000000;
 
-    closest_intersection = INFINITY;
-    closest_figure.flag = 0;
-    try_all_intersections(O, d, min, INFINITY, lst, &closest_figure, &closest_intersection);	
-    color = closest_figure.flag != 0 ? closest_figure.color : data.background;
-    intersection_point = add_vectors(O, scal_x_vec(closest_intersection, normalize(d)));
-    
-    normal = calc_normal(intersection_point, closest_figure);
-    
-    color = color_x_light(color, compute_light(intersection_point, normal, data, lst));
-
+	closest_intersection = INFINITY;
+	closest_figure.flag = 0;
+	try_all_intersections(O, d, min, INFINITY, lst, &closest_figure, &closest_intersection);
+	color = closest_figure.flag != 0 ? closest_figure.color : data.background;
+	intersection_point = add_vectors(O, scal_x_vec(closest_intersection, normalize(d)));
+	normal = calc_normal(intersection_point, closest_figure);
+	color = color_x_light(color, compute_light(intersection_point, normal, data, lst));
     return (color);
 
 }
@@ -124,7 +121,7 @@ void	render_scene(t_scene data, t_figures *lst)
 			//printf("for x %d and y %d the vector d is %f, %f, %f\n", i, j, d.x, d.y, d.z);
 			//puts("\n");
 			color = trace_ray(data.cam->o, d, 0, data, lst);
-
+			
 			data.cam->px_img[j * data.xres + i] = color;
 			i++;
 		}
@@ -134,34 +131,60 @@ void	render_scene(t_scene data, t_figures *lst)
 
 void		init_mlx(t_minilibx *mlx, t_scene *data)
 {
-    t_camera	*cam_begin;
+	t_camera	*cam_begin;
 
-    mlx->mlx_ptr = mlx_init();
-    mlx->win_ptr = mlx_new_window(mlx->mlx_ptr, data->xres, data->yres, "basic miniRT");
-    cam_begin = data->cam;
-    while (data->cam)
-    {
-	data->cam->img_ptr = mlx_new_image(mlx->mlx_ptr, data->xres, data->yres);
-	data->cam->px_img = (int *)mlx_get_data_addr(data->cam->img_ptr, &mlx->bits_per_pixel, &mlx->size_line, &mlx->endian);
-	data->cam = data->cam->next;
-    }
-    data->cam = cam_begin;
+	mlx->mlx_ptr = mlx_init();
+	mlx->win_ptr = mlx_new_window(mlx->mlx_ptr, data->xres, data->yres, "basic miniRT");
+	cam_begin = data->cam;
+	while (data->cam)
+	{
+		data->cam->mlx_ptr = mlx->mlx_ptr;
+		data->cam->win_ptr = mlx->win_ptr;
+		data->cam->img_ptr = mlx_new_image(mlx->mlx_ptr, data->xres, data->yres);
+		data->cam->px_img = (int *)mlx_get_data_addr(data->cam->img_ptr, &mlx->bits_per_pixel, &mlx->size_line, &mlx->endian);
+		data->cam->begin = cam_begin;
+		data->cam = data->cam->next;
+	}
+	data->cam = cam_begin;
 }
 
-int		main(int ac, char **av)
+int			next_cam(int keycode, t_scene *data)
+{
+	if (keycode != 49)
+		return (1);
+	if (data->cam->next)
+	{
+		data->cam = data->cam->next;
+		mlx_put_image_to_window(data->cam->mlx_ptr, data->cam->win_ptr, data->cam->img_ptr, 0, 0);
+	}
+	else
+	{
+		data->cam = data->cam->begin;
+		mlx_put_image_to_window(data->cam->mlx_ptr, data->cam->win_ptr, data->cam->img_ptr, 0, 0);
+	}
+	return (1);
+}
+
+int			main(int ac, char **av)
 {
 	t_minilibx	mlx;
 	t_scene		data;
-	t_figures   	*lst;
+ 	t_figures	*lst;
 	
 	parse_scene(&data, &lst, ac, av);
 	init_mlx(&mlx, &data);
-	
-	render_scene(data, lst); 
+	while (data.cam->next)
+	{
+		render_scene(data, lst);
+		data.cam = data.cam->next;
+	}
+	render_scene(data, lst);
+	data.cam = data.cam->begin;
 
 	mlx_put_image_to_window (mlx.mlx_ptr, mlx.win_ptr, data.cam->img_ptr, 0, 0);
-	mlx_hook(mlx.win_ptr, 17, 1L << 17, exit, &data);
+	mlx_hook(mlx.win_ptr, 17, 1L << 17, exit, (void*)0);
+	mlx_hook(mlx.win_ptr, 2, 0, next_cam, &data);
 	mlx_loop(mlx.mlx_ptr);
-	
-	return (-1);
+
+	return (0);
 }
