@@ -6,7 +6,7 @@
 /*   By: mgarcia- <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/02/10 13:02:52 by mgarcia-          #+#    #+#             */
-/*   Updated: 2020/03/09 23:48:11 by mgarcia-         ###   ########.fr       */
+/*   Updated: 2020/03/10 02:17:20 by mgarcia-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,7 +58,32 @@ double		sphere_intersection(t_p3 o, t_p3 d, t_figures *lst)
 		return (x1 < x2 ? x1 : x2);
 }
 
+
+double		vec_cos(t_p3 a, t_p3 b)
+{
+	return (dot(a, b) / (mod(a) * mod(b)));
+}
+
 double		square_intersection(t_p3 o, t_p3 d, t_figures *lst)
 {
+	t_p3	ip;
+	double	id;
+	t_p3	half_size;
+	t_p3	floor;
+	t_p3	center_to_ip;
+	double	cos1;
+	double	limit;
 	
+	id	= plane_intersection(o, d, lst->fig.sq.c, lst->fig.sq.nv);
+	ip = add_vectors(o, scal_x_vec(id, d));
+	floor = define_vect(0, 1, 0);
+	half_size = cross_product(lst->fig.sq.nv, floor);
+	center_to_ip = substract_vectors(ip, lst->fig.sq.c);
+	cos1 = fabs(vec_cos(half_size, center_to_ip));
+	if (cos1 < sqrt(2) / 2)
+		cos1 = cos(M_PI_2 - acos(cos1));
+	limit = (lst->fig.sq.side / 2) / cos1;
+	if (mod(center_to_ip) <= limit)
+		return (id);
+	return (INFINITY);
 }

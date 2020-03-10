@@ -6,7 +6,7 @@
 /*   By: mgarcia- <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/02/10 13:06:14 by mgarcia-          #+#    #+#             */
-/*   Updated: 2020/03/09 20:04:32 by mgarcia-         ###   ########.fr       */
+/*   Updated: 2020/03/10 02:41:21 by mgarcia-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,7 +47,7 @@ void		compute_light(int *color, t_p3 p, t_p3 normal, t_scene data, t_figures *ls
 		}
 	    data.l = data.l->next;
 	}
-	*color = color_x_light(*color, &rgb);
+	*color = color_x_light(*color, rgb);
 }
 
 t_p3		calc_normal(t_p3 p, t_figures lst)
@@ -58,6 +58,8 @@ t_p3		calc_normal(t_p3 p, t_figures lst)
 		normal = normalize(substract_vectors(p, lst.fig.sp.c));
 	else if (lst.flag & PL)
 		normal = lst.fig.pl.nv;
+	else if (lst.flag & SQ)
+		normal = lst.fig.sq.nv;
 
 	return (normal);
 }
@@ -71,9 +73,9 @@ int		is_lit(t_p3 O, t_p3 d, t_figures *lst)
 		if (lst->flag & SP)
 			in = sphere_intersection(O, d, lst);
 		else if (lst->flag & PL)
-			in = plane_intersection(O, d, lst);
-		/*else if (lst->flag & SQ)
-			in = sqare_intersection;*/
+			in = plane_intersection(O, d, lst->fig.pl.p, lst->fig.pl.nv);
+		else if (lst->flag & SQ)
+			in = square_intersection(O, d, lst);
 		
 
 		if (in > 0.0001 && in < 1)
