@@ -99,7 +99,7 @@ double		triangle_intersection(t_p3 o, t_p3 d, t_figures *lst)
 	v1 = substract_vectors(lst->fig.tr.p2, lst->fig.tr.p1);
 	v2 = substract_vectors(lst->fig.tr.p3, lst->fig.tr.p1);
 
-	lst->fig.tr.nv = cross_product(v1, v2);	
+	lst->fig.tr.nv = cross_product(v2, v1);	
 	id = plane_intersection(o, d, lst->fig.tr.p1, lst->fig.tr.nv);
 	ip = add_vectors(o, scal_x_vec(id, d));
 	
@@ -107,8 +107,8 @@ double		triangle_intersection(t_p3 o, t_p3 d, t_figures *lst)
 	
 	if (vec_cos(cross_product(v1, v2), cross_product(v1, vp)) < 0)
 		return (INFINITY);
-	v1 = substract_vectors(lst->fig.tr.p1, lst->fig.tr.p2);
-	v2 = substract_vectors(lst->fig.tr.p3, lst->fig.tr.p2);
+	v1 = substract_vectors(lst->fig.tr.p3, lst->fig.tr.p2);
+	v2 = substract_vectors(lst->fig.tr.p1, lst->fig.tr.p2);
 	vp = substract_vectors(ip, lst->fig.tr.p2);
 	if (vec_cos(cross_product(v1, v2), cross_product(v1, vp)) < 0)
 		return (INFINITY);
