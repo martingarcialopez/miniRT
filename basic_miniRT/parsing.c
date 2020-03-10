@@ -6,7 +6,7 @@
 /*   By: mgarcia- <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/01/21 11:31:29 by mgarcia-          #+#    #+#             */
-/*   Updated: 2020/03/09 23:46:22 by mgarcia-         ###   ########.fr       */
+/*   Updated: 2020/03/10 03:52:20 by mgarcia-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -347,14 +347,45 @@ void		parse_plane(t_scene *data, t_figures **elem, t_figures **begin, char **str
 	comma(str);
 	lst->color |= stoi(str) << 0;
 }
-/*
-void		parse_triangle(t_scene *data, t_figures *lst, char *str)
-{
-	a
-}
-*/
 
-void	parse_elems(t_scene *data, t_figures **lst, t_figures**begin, char *str)
+void		parse_triangle(t_scene *data, t_figures **elem, t_figures **begin, char **str)
+{
+	t_figures	*lst;
+
+	ft_addnewlst_back(elem, begin);
+	lst = *elem;
+	while (lst->next)
+		lst = lst->next;
+	lst->color = 0;
+	lst->flag = 0;
+	lst->flag |= TR;
+	next(str);
+	lst->fig.tr.p1.x = stof(str);
+	comma(str);
+	lst->fig.tr.p1.y = stof(str);
+	comma(str);
+	lst->fig.tr.p1.z = stof(str);
+	next(str);
+	lst->fig.tr.p2.x = stof(str);
+	comma(str);
+	lst->fig.tr.p2.y = stof(str);
+	comma(str);
+	lst->fig.tr.p2.z = stof(str);
+	next(str);
+	lst->fig.tr.p3.x = stof(str);
+	comma(str);
+	lst->fig.tr.p3.y = stof(str);
+	comma(str);
+	lst->fig.tr.p3.z = stof(str);
+	next(str);
+	lst->color |= stoi(str) << 16;
+	comma(str);
+	lst->color |= stoi(str) << 8;
+	comma(str);
+	lst->color |= stoi(str) << 0;
+}
+
+void	parse_elems(t_scene *data, t_figures **lst, t_figures **begin, char *str)
 {
 	while (*str)
 	{
@@ -379,8 +410,8 @@ void	parse_elems(t_scene *data, t_figures **lst, t_figures**begin, char *str)
 			parse_square(data, lst, begin, &str);
 		else if (*str == 'p' && *(str + 1) == 'l' && *(str++) && *(str++))
 			parse_plane(data, lst, begin, &str);
-		//else if (*str == 't')
-		//	parse_triangle(data, lst, str);
+		else if (*str == 't' && *(str + 1) == 'r' && *(str++) && *(str++))
+			parse_triangle(data, lst, begin, &str);
 		str++;
 	}
 }

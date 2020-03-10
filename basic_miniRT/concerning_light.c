@@ -6,7 +6,7 @@
 /*   By: mgarcia- <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/02/10 13:06:14 by mgarcia-          #+#    #+#             */
-/*   Updated: 2020/03/10 02:41:21 by mgarcia-         ###   ########.fr       */
+/*   Updated: 2020/03/10 04:09:37 by mgarcia-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,7 +60,8 @@ t_p3		calc_normal(t_p3 p, t_figures lst)
 		normal = lst.fig.pl.nv;
 	else if (lst.flag & SQ)
 		normal = lst.fig.sq.nv;
-
+	else if (lst.flag & TR)
+		normal = lst.fig.tr.nv;
 	return (normal);
 }
 
@@ -76,7 +77,8 @@ int		is_lit(t_p3 O, t_p3 d, t_figures *lst)
 			in = plane_intersection(O, d, lst->fig.pl.p, lst->fig.pl.nv);
 		else if (lst->flag & SQ)
 			in = square_intersection(O, d, lst);
-		
+		else if (lst->flag & TR)
+			in = triangle_intersection(O, d, lst);
 
 		if (in > 0.0001 && in < 1)
 			return (0);

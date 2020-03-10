@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   miniRT.c                                           :+:      :+:    :+:   */
+/*   minirt.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: mgarcia- <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/01/20 08:39:55 by mgarcia-          #+#    #+#             */
-/*   Updated: 2020/03/09 23:48:37 by mgarcia-         ###   ########.fr       */
+/*   Updated: 2020/03/10 04:09:46 by mgarcia-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,13 +59,13 @@ void	try_all_intersections(t_p3 o, t_p3 d, double min, double max,
 		if (lst->flag & SP)
 			intersection_distance = sphere_intersection(o, d, lst);
 		else if (lst->flag & PL)
-			intersection_distance = plane_intersection(o, d, lst->fig.pl.o, lst->fig.pl.nv);
-	//	else if (lst->flag & SQ)
-	//		intersection_distance = square_intersection;
-	/*	else if (lst->flag & CY)
-			intersection_distance = cylinder_intersection;
+			intersection_distance = plane_intersection(o, d, lst->fig.pl.p, lst->fig.pl.nv);
+		else if (lst->flag & SQ)
+			intersection_distance = square_intersection(o, d, lst);
 		else if (lst->flag & TR)
-			intersection_distance = triangle_intersection;*/
+			intersection_distance = triangle_intersection(o, d, lst);
+		//else if (lst->flag & CY)
+		//	intersection_distance = cylinder_intersection;
 		if (intersection_distance > min
 				&& intersection_distance < *closest_intersection)
 		{
@@ -90,7 +90,7 @@ int	trace_ray(t_p3 o, t_p3 d, double min, t_scene data, t_figures *lst)
 	closest_figure.flag = 0;
 	try_all_intersections(o, d, min, INFINITY, lst, &closest_figure, &closest_intersection);
 	color = closest_figure.flag != 0 ? closest_figure.color : data.background;
-	intersection_point = add_vectors(o, scal_x_vec(closest_intersection, normalize(d)));
+	intersection_point = add_vectors(o, scal_x_vec(closest_intersection, d));
 	normal = calc_normal(intersection_point, closest_figure);
 	//color = color_x_light(color, compute_light(intersection_point, normal, data, lst));
 	compute_light(&color, intersection_point, normal, data, lst);
@@ -146,8 +146,10 @@ void		init_mlx(t_minilibx *mlx, t_scene *data)
 
 int			next_cam(int keycode, t_scene *data)
 {
+	if (keycode == 53)
+		exit(0);
 	if (keycode != 49)
-		return (1);
+		return (0);
 	if (data->cam->next)
 	{
 		data->cam = data->cam->next;
@@ -158,6 +160,13 @@ int			next_cam(int keycode, t_scene *data)
 		data->cam = data->cam->begin;
 		mlx_put_image_to_window(data->cam->mlx_ptr, data->cam->win_ptr, data->cam->img_ptr, 0, 0);
 	}
+	return (1);
+}
+
+int			close(void *param)
+{
+	puts("miniRT exited successfully");
+	exit(0);
 	return (1);
 }
 
@@ -177,7 +186,7 @@ int			main(int ac, char **av)
 	render_scene(data, lst, mlx);
 	data.cam = data.cam->begin;
 	mlx_put_image_to_window (mlx.mlx_ptr, mlx.win_ptr, data.cam->img_ptr, 0, 0);
-	mlx_hook(mlx.win_ptr, 17, 1L << 17, exit, (void*)0);
+	mlx_hook(mlx.win_ptr, 17, 1L << 17, close, (void *)0);
 	mlx_hook(mlx.win_ptr, 2, 0, next_cam, &data);
 	mlx_loop(mlx.mlx_ptr);
 	return (0);

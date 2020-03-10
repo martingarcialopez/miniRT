@@ -6,7 +6,7 @@
 /*   By: mgarcia- <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/02/10 13:02:52 by mgarcia-          #+#    #+#             */
-/*   Updated: 2020/03/10 02:17:20 by mgarcia-         ###   ########.fr       */
+/*   Updated: 2020/03/10 04:09:45 by mgarcia-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -86,4 +86,36 @@ double		square_intersection(t_p3 o, t_p3 d, t_figures *lst)
 	if (mod(center_to_ip) <= limit)
 		return (id);
 	return (INFINITY);
+}
+
+double		triangle_intersection(t_p3 o, t_p3 d, t_figures *lst)
+{
+	double	id;
+	t_p3	ip;
+	t_p3	v1;
+	t_p3	v2;
+	t_p3	vp;
+	
+	v1 = substract_vectors(lst->fig.tr.p2, lst->fig.tr.p1);
+	v2 = substract_vectors(lst->fig.tr.p3, lst->fig.tr.p1);
+
+	lst->fig.tr.nv = cross_product(v1, v2);	
+	id = plane_intersection(o, d, lst->fig.tr.p1, lst->fig.tr.nv);
+	ip = add_vectors(o, scal_x_vec(id, d));
+	
+	vp = substract_vectors(ip, lst->fig.tr.p1);
+	
+	if (vec_cos(cross_product(v1, v2), cross_product(v1, vp)) < 0)
+		return (INFINITY);
+	v1 = substract_vectors(lst->fig.tr.p1, lst->fig.tr.p2);
+	v2 = substract_vectors(lst->fig.tr.p3, lst->fig.tr.p2);
+	vp = substract_vectors(ip, lst->fig.tr.p2);
+	if (vec_cos(cross_product(v1, v2), cross_product(v1, vp)) < 0)
+		return (INFINITY);
+	v1 = substract_vectors(lst->fig.tr.p1, lst->fig.tr.p3);
+	v2 = substract_vectors(lst->fig.tr.p2, lst->fig.tr.p3);
+	vp = substract_vectors(ip, lst->fig.tr.p3);
+	if (vec_cos(cross_product(v1, v2), cross_product(v1, vp)) < 0)
+		return (INFINITY);
+	return (id);
 }

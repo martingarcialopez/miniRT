@@ -6,7 +6,7 @@
 /*   By: mgarcia- <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/01/20 08:42:41 by mgarcia-          #+#    #+#             */
-/*   Updated: 2020/03/09 23:49:49 by mgarcia-         ###   ########.fr       */
+/*   Updated: 2020/03/10 03:57:55 by mgarcia-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,8 @@
 #include <stdlib.h>
 #include <math.h>
 #include <pthread.h>
+
+#include <stdio.h>
 
 #define PI 3.14159265
 
@@ -112,5 +114,9 @@ t_p3			cross_product(t_p3 a, t_p3 b);
 t_p3			reflect_ray(t_p3 ray, t_p3 normal);
 
 t_p3			define_vect(double x, double y, double z);
+
+double			square_intersection(t_p3 o, t_p3 d, t_figures *lst);
+
+double			triangle_intersection(t_p3 o, t_p3 d, t_figures *lst);
 
 #endif
