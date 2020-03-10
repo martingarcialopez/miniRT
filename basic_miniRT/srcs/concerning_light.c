@@ -6,7 +6,7 @@
 /*   By: mgarcia- <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/02/10 13:06:14 by mgarcia-          #+#    #+#             */
-/*   Updated: 2020/03/10 04:09:37 by mgarcia-         ###   ########.fr       */
+/*   Updated: 2020/03/10 17:49:46 by mgarcia-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,7 +35,6 @@ void		compute_light(int *color, t_p3 p, t_p3 normal, t_scene data, t_figures *ls
 	rgb[0] = 0.0;
 	rgb[1] = 0.0;
 	rgb[2] = 0.0;
-	//light += data.ambient_light;
 	add_coeficient(&rgb, data.ambient_light, data.al_color);
 	while (data.l)
 	{
@@ -62,6 +61,8 @@ t_p3		calc_normal(t_p3 p, t_figures lst)
 		normal = lst.fig.sq.nv;
 	else if (lst.flag & TR)
 		normal = lst.fig.tr.nv;
+	//else if (lst.flag & CY)
+	//	normal = define_vect(0,0,1);
 	return (normal);
 }
 

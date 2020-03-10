@@ -6,7 +6,7 @@
 /*   By: mgarcia- <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/01/20 08:39:55 by mgarcia-          #+#    #+#             */
-/*   Updated: 2020/03/10 04:09:46 by mgarcia-         ###   ########.fr       */
+/*   Updated: 2020/03/10 18:11:23 by mgarcia-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,8 +64,8 @@ void	try_all_intersections(t_p3 o, t_p3 d, double min, double max,
 			intersection_distance = square_intersection(o, d, lst);
 		else if (lst->flag & TR)
 			intersection_distance = triangle_intersection(o, d, lst);
-		//else if (lst->flag & CY)
-		//	intersection_distance = cylinder_intersection;
+		else if (lst->flag & CY)
+			intersection_distance = cylinder_intersection(o, d, lst);
 		if (intersection_distance > min
 				&& intersection_distance < *closest_intersection)
 		{
@@ -111,13 +111,8 @@ void	render_scene(t_scene data, t_figures *lst, t_minilibx mlx)
 		while (i < data.xres)
 		{
 			d = define_vector(i, j, data);
-			//printf("for x %d and y %d the vector d is %f, %f, %f\n", i, j, d.x, d.y, d.z);
 			d = look_at(d, data.cam->vec, data.cam->o);	
-			//puts("After LookAt function");
-			//printf("for x %d and y %d the vector d is %f, %f, %f\n", i, j, d.x, d.y, d.z);
-			//puts("\n");
 			color = trace_ray(data.cam->o, d, 0, data, lst);
-			
 			data.cam->px_img[j * data.xres + i] = color;
 			i++;
 		}
@@ -144,32 +139,6 @@ void		init_mlx(t_minilibx *mlx, t_scene *data)
 	data->cam = cam_begin;
 }
 
-int			next_cam(int keycode, t_scene *data)
-{
-	if (keycode == 53)
-		exit(0);
-	if (keycode != 49)
-		return (0);
-	if (data->cam->next)
-	{
-		data->cam = data->cam->next;
-		mlx_put_image_to_window(data->cam->mlx_ptr, data->cam->win_ptr, data->cam->img_ptr, 0, 0);
-	}
-	else
-	{
-		data->cam = data->cam->begin;
-		mlx_put_image_to_window(data->cam->mlx_ptr, data->cam->win_ptr, data->cam->img_ptr, 0, 0);
-	}
-	return (1);
-}
-
-int			close(void *param)
-{
-	puts("miniRT exited successfully");
-	exit(0);
-	return (1);
-}
-
 int			main(int ac, char **av)
 {
 	t_minilibx	mlx;
@@ -186,7 +155,7 @@ int			main(int ac, char **av)
 	render_scene(data, lst, mlx);
 	data.cam = data.cam->begin;
 	mlx_put_image_to_window (mlx.mlx_ptr, mlx.win_ptr, data.cam->img_ptr, 0, 0);
-	mlx_hook(mlx.win_ptr, 17, 1L << 17, close, (void *)0);
+	mlx_hook(mlx.win_ptr, 17, 1L << 17, ft_close, (void *)0);
 	mlx_hook(mlx.win_ptr, 2, 0, next_cam, &data);
 	mlx_loop(mlx.mlx_ptr);
 	return (0);

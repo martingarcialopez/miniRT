@@ -1,15 +1,19 @@
 NAME	= miniRT
 
+HEAD	= includes/
+
 OBJS	= \
-		minirt.o \
-		parsing.o \
-		vector_operations.o \
-		concerning_light.o \
-		intersections.o
+		srcs/minirt.o \
+		srcs/parsing.o \
+		srcs/vector_operations.o \
+		srcs/vector_operations2.o\
+		srcs/concerning_light.o \
+		srcs/intersections.o \
+		srcs/utils.o
 
 #OBJS	= ${SRCS:.c=.o}
 
-CC		= gcc
+CC		= gcc -I $(HEAD)
 
 RM		= rm -f
 
@@ -19,7 +23,7 @@ FLAGS	= -framework OpenGL -framework AppKit #-I includes/
 #		${CC} ${FLAGS} -c $< -o ${<:.c=.o}
 
 ${NAME}:	${OBJS}
-	${CC} ${FLAGS} $(OBJS) libft.a libmlx.a -o ${NAME}
+	${CC} ${FLAGS} $(OBJS) $(HEAD)libft.a $(HEAD)libmlx.a -o ${NAME}
 
 all:		${NAME}
 

@@ -6,7 +6,7 @@
 /*   By: mgarcia- <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/01/20 08:42:41 by mgarcia-          #+#    #+#             */
-/*   Updated: 2020/03/10 03:57:55 by mgarcia-         ###   ########.fr       */
+/*   Updated: 2020/03/10 18:11:25 by mgarcia-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,12 +15,17 @@
 
 #include <OpenGL/gl3.h>
 #include "mlx.h"
+#include "libft.h"
 #include "figures.h"
+#include <fcntl.h>
 #include <stdlib.h>
 #include <math.h>
 #include <pthread.h>
 
+#include <unistd.h>
 #include <stdio.h>
+
+#define BUFSIZE	32
 
 #define PI 3.14159265
 
@@ -83,6 +88,14 @@ typedef struct		s_minilibx
 	int				*pixel_tab;
 }					t_minilibx;
 
+char			*readfile(char *str, int fd);
+
+int				stoi(char **str);
+
+double			stof(char **str);
+
+void			ft_addnewlst_back(t_figures **alst, t_figures **begin);
+
 double 			dot(t_p3 a, t_p3 b);
 
 double			mod(t_p3 v);
@@ -111,12 +124,20 @@ int				is_lit(t_p3 O, t_p3 d, t_figures *lst);
 
 t_p3			cross_product(t_p3 a, t_p3 b);
 
-t_p3			reflect_ray(t_p3 ray, t_p3 normal);
+double			vec_cos(t_p3 a, t_p3 b);
 
 t_p3			define_vect(double x, double y, double z);
 
 double			square_intersection(t_p3 o, t_p3 d, t_figures *lst);
 
 double			triangle_intersection(t_p3 o, t_p3 d, t_figures *lst);
+
+double			cylinder_intersection(t_p3 o, t_p3 d ,t_figures *lst);
+
+int				p_is_outside(t_p3 p1, t_p3 p2, t_p3 p3, t_p3 ip);
+
+int				next_cam(int keycode, t_scene *data);
+
+int				ft_close(void *param);
 
 #endif
