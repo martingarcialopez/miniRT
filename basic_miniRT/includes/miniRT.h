@@ -6,7 +6,7 @@
 /*   By: mgarcia- <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/01/20 08:42:41 by mgarcia-          #+#    #+#             */
-/*   Updated: 2020/03/10 18:11:25 by mgarcia-         ###   ########.fr       */
+/*   Updated: 2020/03/12 19:56:50 by mgarcia-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,7 @@
 #include <OpenGL/gl3.h>
 #include "mlx.h"
 #include "libft.h"
+#include "ft_printf.h"
 #include "figures.h"
 #include <fcntl.h>
 #include <stdlib.h>
@@ -26,8 +27,6 @@
 #include <stdio.h>
 
 #define BUFSIZE	32
-
-#define PI 3.14159265
 
 #define SP (1 << 0)
 #define PL (1 << 1)
@@ -139,5 +138,11 @@ int				p_is_outside(t_p3 p1, t_p3 p2, t_p3 p3, t_p3 ip);
 int				next_cam(int keycode, t_scene *data);
 
 int				ft_close(void *param);
+
+void			*ec_malloc(unsigned int size);
+
+void			usage(char *program_name);
+
+void			fatal(char *message);
 
 #endif

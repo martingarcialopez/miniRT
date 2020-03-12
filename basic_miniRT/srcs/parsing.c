@@ -6,7 +6,7 @@
 /*   By: mgarcia- <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/01/21 11:31:29 by mgarcia-          #+#    #+#             */
-/*   Updated: 2020/03/10 18:03:24 by mgarcia-         ###   ########.fr       */
+/*   Updated: 2020/03/12 21:31:36 by mgarcia-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,14 +18,41 @@ void		next(char **str)
 		(*str)++;
 }
 
+
 void		comma(char **str)
 {
 	if (**str != ',')
 	{
-		ft_putstr("Scene Error\naprende a hacer una escena en condiciones gilipollas\n");
+		perror("Scene Error: aprende a hacer una escena en condiciones gilipollas\n");
 		exit(0);
 	}	
 	(*str)++;
+}
+
+t_p3		parse_p3(char **str)
+{
+	t_p3	p;
+
+	p.x = stof(str);
+	comma(str);
+	p.y = stof(str);
+	comma(str);
+	p.z = stof(str);
+	next(str);
+	return (p);
+}
+
+int			parse_color(char **str)
+{
+	int	color;
+
+	color = 0;
+	color |= stoi(str) << 16;
+	comma(str);
+	color |= stoi(str) << 8;
+	comma(str);
+	color |= stoi(str);
+	return (color);
 }
 
 void		parse_res(t_scene *data, char **str)
@@ -43,11 +70,7 @@ void		parse_ambient_light(t_scene *data, char **str)
 	next(str);
 	data->ambient_light = stof(str);
 	next(str);
-	data->al_color |= stoi(str) << 16;
-	comma(str);
-	data->al_color |= stoi(str) << 8;
-	comma(str);
-	data->al_color |= stoi(str) << 0;
+	data->al_color = parse_color(str);
 }
 
 void		parse_camera(t_scene *data, char **str)
@@ -58,8 +81,7 @@ void		parse_camera(t_scene *data, char **str)
 
 	begin = data->cam;
 	list = data->cam;
-	if (!(elem = malloc(sizeof(t_camera))))
-		exit (1);
+	elem = ec_malloc(sizeof(t_camera));
 	elem->next = NULL;
 	if (list)
 	{
@@ -72,23 +94,10 @@ void		parse_camera(t_scene *data, char **str)
 		list = elem;
 		begin = elem;
 	}
-	
 	next(str);
-	elem->o.x = stof(str);
-	comma(str);
-	elem->o.y = stof(str);
-	comma(str);
-	elem->o.z = stof(str);
-	next(str);
-	elem->vec.x = stof(str);
-	comma(str);
-	elem->vec.y = stof(str);
-	comma(str);
-	elem->vec.z = stof(str);
-	next(str);
+	elem->o = parse_p3(str);
+	elem->vec = parse_p3(str);
 	elem->fov = stoi(str);
-
-
 	data->cam = begin;
 }
 
@@ -102,29 +111,14 @@ void		parse_cylinder(t_scene *data, t_figures **elem, t_figures **begin, char **
 		lst = lst->next;
 	lst->flag = 0;
 	lst->flag |= CY;
-	lst->color = 0;
 	next(str);
-	lst->fig.cy.c.x = stof(str);
-	comma(str);
-	lst->fig.cy.c.y = stof(str);
-	comma(str);
-	lst->fig.cy.c.z = stof(str);
-	next(str);
-	lst->fig.cy.nv.x = stof(str);
-	comma(str);
-	lst->fig.cy.nv.y = stof(str);
-	comma(str);
-	lst->fig.cy.nv.z = stof(str);
-	next(str);
+	lst->fig.cy.c = parse_p3(str);
+	lst->fig.cy.nv = parse_p3(str);
 	lst->fig.cy.r = stof(str) / 2;
 	next(str);
 	lst->fig.cy.h = stof(str);
 	next(str);
-	lst->color |= stoi(str) << 16;
-	comma(str);
-	lst->color |= stoi(str) << 8;
-	comma(str);
-	lst->color |= stoi(str) << 0;
+	lst->color = parse_color(str); 
 }
 
 void		parse_light(t_scene **data, char **str)
@@ -135,8 +129,7 @@ void		parse_light(t_scene **data, char **str)
 
 	begin = (*data)->l;
 	list = (*data)->l;
-	if (!(elem = malloc(sizeof(t_light))))
-		exit (1);
+	elem = ec_malloc(sizeof(t_light));
 	elem->next = NULL;
 	if (list)
 	{
@@ -150,23 +143,11 @@ void		parse_light(t_scene **data, char **str)
 		list = elem;
 		begin = elem;
 	}
-	
-	list->color = 0;
 	next(str);
-	list->o.x = stof(str);
-	comma(str);
-	list->o.y = stof(str);
-	comma(str);
-	list->o.z = stof(str);
-	next(str);
+	list->o = parse_p3(str);
 	list->br = stof(str);
 	next(str);
-	list->color |= stoi(str) << 16;
-	comma(str);
-	list->color |= stoi(str) << 8;
-	comma(str);
-	list->color |= stoi(str) << 0;
-
+	list->color = parse_color(str);
 	(*data)->l = begin;
 }
 
@@ -180,21 +161,11 @@ void		parse_sphere(t_scene *data, t_figures **elem, t_figures **begin, char **st
 		lst = lst->next;
 	lst->flag = 0;
 	lst->flag |= SP;
-	lst->color = 0;
 	next(str);
-	lst->fig.sp.c.x = stof(str);
-	comma(str);
-	lst->fig.sp.c.y = stof(str);
-	comma(str);
-	lst->fig.sp.c.z = stof(str);
-	next(str);
+	lst->fig.sp.c = parse_p3(str);
 	lst->fig.sp.r = stof(str) / 2;
 	next(str);
-	lst->color |= stoi(str) << 16;
-	comma(str);
-	lst->color |= stoi(str) << 8;
-	comma(str);
-	lst->color |= stoi(str) << 0;
+	lst->color = parse_color(str);
 }
 
 void		parse_square(t_scene *data, t_figures **elem, t_figures **begin, char **str)
@@ -205,29 +176,14 @@ void		parse_square(t_scene *data, t_figures **elem, t_figures **begin, char **st
 	lst = *elem;
 	while (lst->next)
 		lst = lst->next;
-	lst->color = 0;
 	lst->flag = 0;
 	lst->flag |= SQ;
 	next(str);
-	lst->fig.sq.c.x = stof(str);
-	comma(str);
-	lst->fig.sq.c.y = stof(str);
-	comma(str);
-	lst->fig.sq.c.z = stof(str);
-	next(str);
-	lst->fig.sq.nv.x = stof(str);
-	comma(str);
-	lst->fig.sq.nv.y = stof(str);
-	comma(str);
-	lst->fig.sq.nv.z = stof(str);
-	next(str);
+	lst->fig.sq.c = parse_p3(str);
+	lst->fig.sq.nv = parse_p3(str);
 	lst->fig.sq.side = stof(str);
 	next(str);
-	lst->color |= stoi(str) << 16;
-	comma(str);
-	lst->color |= stoi(str) << 8;
-	comma(str);
-	lst->color |= stoi(str) << 0;
+	lst->color = parse_color(str);
 }
 
 void		parse_plane(t_scene *data, t_figures **elem, t_figures **begin, char **str)
@@ -238,27 +194,12 @@ void		parse_plane(t_scene *data, t_figures **elem, t_figures **begin, char **str
 	lst = *elem;
 	while (lst->next)
 		lst = lst->next;
-	lst->color = 0;
 	lst->flag = 0;
 	lst->flag |= PL;
 	next(str);
-	lst->fig.pl.p.x = stof(str);
-	comma(str);
-	lst->fig.pl.p.y = stof(str);
-	comma(str);
-	lst->fig.pl.p.z = stof(str);
-	next(str);
-	lst->fig.pl.nv.x = stof(str);
-	comma(str);
-	lst->fig.pl.nv.y = stof(str);
-	comma(str);
-	lst->fig.pl.nv.z = stof(str);
-	next(str);
-	lst->color |= stoi(str) << 16;
-	comma(str);
-	lst->color |= stoi(str) << 8;
-	comma(str);
-	lst->color |= stoi(str) << 0;
+	lst->fig.pl.p = parse_p3(str);
+	lst->fig.pl.nv = parse_p3(str);
+	lst->color = parse_color(str);
 }
 
 void		parse_triangle(t_scene *data, t_figures **elem, t_figures **begin, char **str)
@@ -269,33 +210,13 @@ void		parse_triangle(t_scene *data, t_figures **elem, t_figures **begin, char **
 	lst = *elem;
 	while (lst->next)
 		lst = lst->next;
-	lst->color = 0;
 	lst->flag = 0;
 	lst->flag |= TR;
 	next(str);
-	lst->fig.tr.p1.x = stof(str);
-	comma(str);
-	lst->fig.tr.p1.y = stof(str);
-	comma(str);
-	lst->fig.tr.p1.z = stof(str);
-	next(str);
-	lst->fig.tr.p2.x = stof(str);
-	comma(str);
-	lst->fig.tr.p2.y = stof(str);
-	comma(str);
-	lst->fig.tr.p2.z = stof(str);
-	next(str);
-	lst->fig.tr.p3.x = stof(str);
-	comma(str);
-	lst->fig.tr.p3.y = stof(str);
-	comma(str);
-	lst->fig.tr.p3.z = stof(str);
-	next(str);
-	lst->color |= stoi(str) << 16;
-	comma(str);
-	lst->color |= stoi(str) << 8;
-	comma(str);
-	lst->color |= stoi(str) << 0;
+	lst->fig.tr.p1 = parse_p3(str);
+	lst->fig.tr.p2 = parse_p3(str);
+	lst->fig.tr.p3 = parse_p3(str);
+	lst->color = parse_color(str);
 }
 
 void	parse_elems(t_scene *data, t_figures **lst, t_figures **begin, char *str)
@@ -331,20 +252,18 @@ void	parse_elems(t_scene *data, t_figures **lst, t_figures **begin, char *str)
 
 void	parse_scene(t_scene *data, t_figures **lst, int ac, char **av)
 {
-	t_figures   	*begin;
+	t_figures	*begin;
 	char		*str;
-	int		fd;
+	int			fd;
 
 	if (ac != 2)
-	{
-		printf("Error\n");
-		exit(0);
-	}
+		usage(av[0]);
 	*lst = NULL;
 	data->l = NULL;
 	data->cam = NULL;
-	str = (char *)malloc(sizeof(char) * (BUFSIZE + 1));
-	fd = open(av[1], 0);
+	str = (char *)ec_malloc(sizeof(char) * (BUFSIZE + 1));
+	if ((fd = open(av[1], 0)) == -1)
+		fatal("while opening file");
 	str = readfile(str, fd);
 	parse_elems(data, lst, &begin, str);
 	*lst = begin;

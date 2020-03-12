@@ -6,7 +6,7 @@
 /*   By: mgarcia- <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/10 18:06:59 by mgarcia-          #+#    #+#             */
-/*   Updated: 2020/03/10 18:11:24 by mgarcia-         ###   ########.fr       */
+/*   Updated: 2020/03/12 16:04:47 by mgarcia-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -114,6 +114,32 @@ int			next_cam(int keycode, t_scene *data)
 
 int			ft_close(void *param)
 {
-	exit(0);
+	exit(EXIT_SUCCESS);
 	return (1);
+}
+
+void		fatal(char *message)
+{
+	char error_message[100];
+	
+	ft_strcpy(error_message, "[!!] Fatal Error ");
+	ft_strncat(error_message, message, 83);
+	perror(error_message);
+	exit(EXIT_FAILURE);
+}
+
+void		*ec_malloc(unsigned int size)
+{
+	void *ptr;
+ 
+	ptr = malloc(size);
+	if (ptr == NULL)
+		fatal("in malloc() on memory allocation");
+	return (ptr);
+}
+
+void		usage(char *program_name)
+{
+	ft_printf("Usage: %s <scene.rt>\n", program_name);
+	exit(EXIT_FAILURE);
 }

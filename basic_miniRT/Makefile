@@ -23,7 +23,7 @@ FLAGS	= -framework OpenGL -framework AppKit #-I includes/
 #		${CC} ${FLAGS} -c $< -o ${<:.c=.o}
 
 ${NAME}:	${OBJS}
-	${CC} ${FLAGS} $(OBJS) $(HEAD)libft.a $(HEAD)libmlx.a -o ${NAME}
+	${CC} -g ${FLAGS} $(OBJS) $(HEAD)libftprintf.a $(HEAD)libmlx.a -o ${NAME}
 
 all:		${NAME}
 

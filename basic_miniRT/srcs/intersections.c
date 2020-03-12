@@ -6,7 +6,7 @@
 /*   By: mgarcia- <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/02/10 13:02:52 by mgarcia-          #+#    #+#             */
-/*   Updated: 2020/03/10 17:45:32 by mgarcia-         ###   ########.fr       */
+/*   Updated: 2020/03/12 19:54:20 by mgarcia-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,13 +17,10 @@ double		plane_intersection(t_p3 o, t_p3 d, t_p3 plane_p, t_p3 plane_nv)
 	double	x;
 	double	denom;
 
-	denom  = dot(plane_nv, d);
-
+	denom = dot(plane_nv, d);
 	if (denom == 0)
 		return (INFINITY);
-
 	x = (dot(plane_nv, substract_vectors(plane_p, o))) / denom;
-
 	return (x > 0 ? x : INFINITY);
 }
 
@@ -41,12 +38,9 @@ double		sphere_intersection(t_p3 o, t_p3 d, t_figures *lst)
 	k1 = dot(d, d);
 	k2 = 2 * dot(d, oc);
 	k3 = dot(oc, oc) - lst->fig.sp.r * lst->fig.sp.r;
-
 	disc = k2 * k2 - (4 * k1 * k3);
-
 	x1 = (-k2 + sqrt(disc)) / (2 * k1);
 	x2 = (-k2 - sqrt(disc)) / (2 * k1);
-
 	if (disc < 0)
 		return (INFINITY);
 	else if (disc == 0)
@@ -113,10 +107,8 @@ double		cylinder_intersection(t_p3 o, t_p3 d, t_figures *lst)
 	k1 = dot(d_x_a, cross_product(lst->fig.cy.c, lst->fig.cy.nv));
 	k2 = dot(d_x_a, d_x_a);
 	disc = (k2 * pow(r, 2)) - (dot(lst->fig.cy.nv, lst->fig.cy.nv) * pow(dot(lst->fig.cy.c, d_x_a), 2));
-
 	x1 = (k1 + sqrt(disc)) / k2;
 	x2 = (k1 - sqrt(disc)) / k2;
-
 	//if (mod(cross_product(d, lst->fig.cy.nv)) == 0)
 	//	return (x1);
 	if (disc < 0)

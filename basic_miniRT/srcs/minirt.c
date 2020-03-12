@@ -6,7 +6,7 @@
 /*   By: mgarcia- <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/01/20 08:39:55 by mgarcia-          #+#    #+#             */
-/*   Updated: 2020/03/10 18:11:23 by mgarcia-         ###   ########.fr       */
+/*   Updated: 2020/03/12 19:38:34 by mgarcia-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,7 @@ t_p3		define_vector(int i, int j, t_scene data)
 	t_p3	p;
 
 	img_asp_ratio = (double)data.xres / (double)data.yres;
-	correct_fov = tan((data.cam->fov * PI / 180) / 2);
+	correct_fov = tan((data.cam->fov * M_PI / 180) / 2);
 	p.x = ((2 * ((i + 0.5) / data.xres)) - 1) * img_asp_ratio * correct_fov;
 	p.y = (1 - (2 * ((j + 0.5) / data.yres))) * correct_fov;
 	p.z = -1;
