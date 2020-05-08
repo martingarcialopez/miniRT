@@ -73,14 +73,14 @@ void		parse_ambient_light(t_scene *data, char **str)
 	data->al_color = parse_color(str);
 }
 
-void		parse_camera(t_scene *data, char **str)
+void		parse_camera(t_minilibx *mlx, char **str)
 {
 	t_camera	*elem;
 	t_camera	*list;
 	t_camera	*begin;
 
-	begin = data->cam;
-	list = data->cam;
+	begin = mlx->cam;
+	list = mlx->cam;
 	elem = ec_malloc(sizeof(t_camera));
 	elem->next = NULL;
 	if (list)
@@ -96,12 +96,12 @@ void		parse_camera(t_scene *data, char **str)
 	}
 	next(str);
 	elem->o = parse_p3(str);
-	elem->vec = parse_p3(str);
+	elem->nv = parse_p3(str);
 	elem->fov = stoi(str);
-	data->cam = begin;
+	mlx->cam = begin;
 }
 
-void		parse_cylinder(t_scene *data, t_figures **elem, t_figures **begin, char **str)
+void		parse_cylinder(t_figures **elem, t_figures **begin, char **str)
 {
 	t_figures	*lst;
 	
@@ -151,7 +151,7 @@ void		parse_light(t_scene **data, char **str)
 	(*data)->l = begin;
 }
 
-void		parse_sphere(t_scene *data, t_figures **elem, t_figures **begin, char **str)
+void		parse_sphere(t_figures **elem, t_figures **begin, char **str)
 {
 	t_figures   *lst;
 
@@ -159,8 +159,8 @@ void		parse_sphere(t_scene *data, t_figures **elem, t_figures **begin, char **st
 	lst = *elem;
 	while (lst->next)
 		lst = lst->next;
-	lst->flag = 0;
-	lst->flag |= SP;
+	//lst->flag = 0;
+	lst->flag = SP;
 	next(str);
 	lst->fig.sp.c = parse_p3(str);
 	lst->fig.sp.r = stof(str) / 2;
@@ -168,7 +168,7 @@ void		parse_sphere(t_scene *data, t_figures **elem, t_figures **begin, char **st
 	lst->color = parse_color(str);
 }
 
-void		parse_square(t_scene *data, t_figures **elem, t_figures **begin, char **str)
+void		parse_square(t_figures **elem, t_figures **begin, char **str)
 {
 	t_figures   *lst;
 	
@@ -180,13 +180,13 @@ void		parse_square(t_scene *data, t_figures **elem, t_figures **begin, char **st
 	lst->flag |= SQ;
 	next(str);
 	lst->fig.sq.c = parse_p3(str);
-	lst->fig.sq.nv = parse_p3(str);
+	lst->normal = parse_p3(str);
 	lst->fig.sq.side = stof(str);
 	next(str);
 	lst->color = parse_color(str);
 }
 
-void		parse_plane(t_scene *data, t_figures **elem, t_figures **begin, char **str)
+void		parse_plane(t_figures **elem, t_figures **begin, char **str)
 {
 	t_figures   *lst;
 	
@@ -198,11 +198,11 @@ void		parse_plane(t_scene *data, t_figures **elem, t_figures **begin, char **str
 	lst->flag |= PL;
 	next(str);
 	lst->fig.pl.p = parse_p3(str);
-	lst->fig.pl.nv = parse_p3(str);
+	lst->normal = parse_p3(str);
 	lst->color = parse_color(str);
 }
 
-void		parse_triangle(t_scene *data, t_figures **elem, t_figures **begin, char **str)
+void		parse_triangle(t_figures **elem, t_figures **begin, char **str)
 {
 	t_figures	*lst;
 
@@ -216,10 +216,12 @@ void		parse_triangle(t_scene *data, t_figures **elem, t_figures **begin, char **
 	lst->fig.tr.p1 = parse_p3(str);
 	lst->fig.tr.p2 = parse_p3(str);
 	lst->fig.tr.p3 = parse_p3(str);
+	lst->normal = cross(vsubstract(lst->fig.tr.p3, lst->fig.tr.p1),
+			vsubstract(lst->fig.tr.p2, lst->fig.tr.p1));
 	lst->color = parse_color(str);
 }
 
-void	parse_elems(t_scene *data, t_figures **lst, t_figures **begin, char *str)
+void	parse_elems(t_minilibx *mlx, t_scene *data, t_figures **lst, t_figures **begin, char *str)
 {
 	while (*str)
 	{
@@ -233,38 +235,36 @@ void	parse_elems(t_scene *data, t_figures **lst, t_figures **begin, char *str)
 		else if (*str == 'A' && *(str++))
 			parse_ambient_light(data, &str);
 		else if (*str == 'c' && (*(str + 1) == 32 || *(str + 1) == 9) && *(str++))
-			parse_camera(data, &str);
+			parse_camera(mlx, &str);
 		else if (*str == 'c' && *(str + 1) == 'y' && *(str++) && *(str++))
-			parse_cylinder(data, lst, begin, &str);
+			parse_cylinder(lst, begin, &str);
 		else if (*str == 'l' && (*(str + 1) == 32 || *(str + 1) == 9) && *(str++))
 			parse_light(&data, &str);
 		else if (*str == 's' && *(str + 1) == 'p' && *(str++) && *(str++))
-			parse_sphere(data, lst, begin, &str);
+			parse_sphere(lst, begin, &str);
 		else if (*str == 's' && *(str + 1) == 'q' && *(str++) && *(str++))
-			parse_square(data, lst, begin, &str);
+			parse_square(lst, begin, &str);
 		else if (*str == 'p' && *(str + 1) == 'l' && *(str++) && *(str++))
-			parse_plane(data, lst, begin, &str);
+			parse_plane(lst, begin, &str);
 		else if (*str == 't' && *(str + 1) == 'r' && *(str++) && *(str++))
-			parse_triangle(data, lst, begin, &str);
+			parse_triangle(lst, begin, &str);
 		str++;
 	}
 }
 
-void	parse_scene(t_scene *data, t_figures **lst, int ac, char **av)
+void	parse_scene(t_minilibx *mlx, t_scene *data, t_figures **lst, char **av)
 {
 	t_figures	*begin;
 	char		*str;
 	int			fd;
 
-	if (ac != 2)
-		usage(av[0]);
 	*lst = NULL;
 	data->l = NULL;
-	data->cam = NULL;
+	mlx->cam = NULL;
 	str = (char *)ec_malloc(sizeof(char) * (BUFSIZE + 1));
 	if ((fd = open(av[1], 0)) == -1)
 		fatal("while opening file");
 	str = readfile(str, fd);
-	parse_elems(data, lst, &begin, str);
+	parse_elems(mlx, data, lst, &begin, str);
 	*lst = begin;
 }

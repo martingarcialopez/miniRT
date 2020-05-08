@@ -24,13 +24,12 @@ void				add_coeficient(double (*rgb)[3], double coef, int color)
 	(*rgb)[2] += coef * (color & mask) / 255;
 }
 
-void				compute_light(int *color, t_p3 p, t_p3 normal,
-					t_scene data, t_figures *lst)
+void				compute_light(int *color, t_p3 p, t_p3 normal, t_scene data, t_figures *lst, double (*fun_ptr[NUM_FIGS])(t_p3, t_p3, t_figures *))
 {
 	double			light;
 	double			rgb[3];
 	t_p3			direction;
-	t_p3			p_to_cam;
+//	t_p3			p_to_cam;
 
 	light = 0.0;
 	rgb[0] = 0.0;
@@ -39,48 +38,37 @@ void				compute_light(int *color, t_p3 p, t_p3 normal,
 	add_coeficient(&rgb, data.ambient_light, data.al_color);
 	while (data.l)
 	{
-		direction = substract_vectors(data.l->o, p);
-		if (is_lit(p, direction, lst) && dot(normal, direction) > 0)
+		direction = vsubstract(data.l->o, p);
+		if (is_lit(p, direction, lst, fun_ptr) && dot(normal, direction) > 0)
 		{
-			light = data.l->br * vec_cos(normal, direction);
+			light = data.l->br * vcos(normal, direction);
 			add_coeficient(&rgb, light, data.l->color);
 		}
 		data.l = data.l->next;
 	}
-	*color = color_x_light(color, rgb);
+	*color = color_x_light(*color, rgb);
 }
 
-t_p3				calc_normal(t_p3 p, t_figures lst)
+void				calc_normal(t_p3 p, t_p3 d, t_p3 *normal, t_figures lst)
 {
-	t_p3			normal;
-
-	if (lst.flag & SP)
-		normal = normalize(substract_vectors(p, lst.fig.sp.c));
-	else if (lst.flag & PL)
-		normal = lst.fig.pl.nv;
-	else if (lst.flag & SQ)
-		normal = lst.fig.sq.nv;
-	else if (lst.flag & TR)
-		normal = lst.fig.tr.nv;
-	else if (lst.flag & CY)
-		normal = define_vect(0, 0, 1);
-	return (normal);
+	if ((lst.flag == PL) || (lst.flag == SQ) || (lst.flag == TR) || (lst.flag == CY))
+		*normal = vcos(d, lst.normal) > 0 ? scal_x_vec(-1, lst.normal) : lst.normal;
+		//*normal = lst.normal;
+	else if (lst.flag == SP)
+		*normal = normalize(vsubstract(p, lst.fig.sp.c));
+	//else if (lst.flag == CY)
+	//	*normal = lst.normal;
+	//else if (lst.flag == SQ)
+	//	*normal = lst.normal;
 }
 
-int					is_lit(t_p3 o, t_p3 d, t_figures *lst)
+int					is_lit(t_p3 o, t_p3 d, t_figures *lst, double (*fun_ptr[NUM_FIGS])(t_p3, t_p3, t_figures *))
 {
 	double			in;
 
 	while (lst)
 	{
-		if (lst->flag & SP)
-			in = sphere_intersection(o, d, lst);
-		else if (lst->flag & PL)
-			in = plane_intersection(o, d, lst->fig.pl.p, lst->fig.pl.nv);
-		else if (lst->flag & SQ)
-			in = square_intersection(o, d, lst);
-		else if (lst->flag & TR)
-			in = triangle_intersection(o, d, lst);
+		in = (fun_ptr[lst->flag])(o, d, lst);
 		if (in > 0.0001 && in < 1)
 			return (0);
 		lst = lst->next;

@@ -6,7 +6,7 @@
 /*   By: mgarcia- <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/10/16 21:15:32 by mgarcia-          #+#    #+#             */
-/*   Updated: 2020/03/12 15:48:41 by mgarcia-         ###   ########.fr       */
+/*   Updated: 2019/10/18 18:16:52 by mgarcia-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,6 +21,8 @@ typedef struct		s_list
 	void			*content;
 	struct s_list	*next;
 }					t_list;
+
+int					ft_printf(const char *format, ...) __attribute__((format(printf,1,2)));
 
 int					ft_atoi(const char *str);
 

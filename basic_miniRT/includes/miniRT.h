@@ -16,7 +16,7 @@
 #include <OpenGL/gl3.h>
 #include "mlx.h"
 #include "libft.h"
-#include "ft_printf.h"
+#include "libvct.h"
 #include "figures.h"
 #include <fcntl.h>
 #include <stdlib.h>
@@ -28,24 +28,26 @@
 
 #define BUFSIZE	32
 
-#define SP (1 << 0)
-#define PL (1 << 1)
-#define SQ (1 << 2)
-#define CY (1 << 3)
-#define TR (1 << 4)
+#define SP 0
+#define PL 1
+#define SQ 2
+#define TR 3
+#define CY 4
+
+#define NUM_FIGS 5
 
 typedef struct		s_camera
 {
     t_p3			o;
-    t_p3			vec;
+    t_p3			nv;
     int				fov;
-    void			*mlx_ptr;
-	void			*win_ptr;
 	void			*img_ptr;
     int				*px_img;
-	struct s_camera	*begin;
+	int				bits_per_pixel;
+	int				size_line;
+	int				endian;
     struct s_camera	*next;
-}			t_camera;
+}					t_camera;
 
 typedef struct		s_light
 {
@@ -59,7 +61,6 @@ typedef struct		s_scene
 {
 	int				xres;
 	int				yres;
-	t_camera		*cam;
 	t_light			*l;
 	double			ambient_light;
 	int				al_color;
@@ -73,6 +74,7 @@ typedef struct		s_figures
 	int				flag;
 	union figures	fig;
 	int				color;
+	t_p3			normal;
 	struct s_figures*next;
 }					t_figures;
 
@@ -80,11 +82,8 @@ typedef struct		s_minilibx
 {
 	void			*mlx_ptr;
 	void			*win_ptr;
-	void			*img_ptr;
-	int				bits_per_pixel;
-	int				size_line;
-	int				endian;
-	int				*pixel_tab;
+	t_camera		*cam;
+	t_camera		*begin;
 }					t_minilibx;
 
 char			*readfile(char *str, int fd);
@@ -95,47 +94,32 @@ double			stof(char **str);
 
 void			ft_addnewlst_back(t_figures **alst, t_figures **begin);
 
-double 			dot(t_p3 a, t_p3 b);
+void			parse_scene(t_minilibx *mlx, t_scene *data, t_figures **lst, char **av);
 
-double			mod(t_p3 v);
-
-t_p3			scal_x_vec(double n, t_p3 p);
-
-t_p3			add_vectors(t_p3 a, t_p3 b);
-
-t_p3			substract_vectors(t_p3 a, t_p3 b);
-
-void			parse_scene(t_scene *data, t_figures **lst, int ac, char **av);
-
-double			sphere_intersection(t_p3 O, t_p3 d, t_figures *lst);
-
-double			plane_intersection(t_p3 O, t_p3 d, t_p3 plane_p, t_p3 plane_nv);
-
-void			compute_light(int *color, t_p3 p, t_p3 normal, t_scene data, t_figures *lst);
+void			compute_light(int *color, t_p3 p, t_p3 normal, t_scene data, t_figures *lst,
+		double (*fun_ptr[NUM_FIGS])(t_p3, t_p3, t_figures *));
 
 int 			color_x_light(int color, double rgb[3]);
 
-t_p3			calc_normal(t_p3 p, t_figures lst);
+void			calc_normal(t_p3 p, t_p3 d, t_p3 *normal, t_figures lst);
 
-double			distance(t_p3 p1, t_p3 p2);
+int				is_lit(t_p3 O, t_p3 d, t_figures *lst, double (*fun_ptr[NUM_FIGS])(t_p3, t_p3, t_figures *));
 
-int				is_lit(t_p3 O, t_p3 d, t_figures *lst);
+double			pl_intersection(t_p3 o, t_p3 d, t_p3 plane_p, t_p3 plane_nv);
 
-t_p3			cross_product(t_p3 a, t_p3 b);
+double			sphere_intersection(t_p3 O, t_p3 d, t_figures *lst);
 
-double			vec_cos(t_p3 a, t_p3 b);
-
-t_p3			define_vect(double x, double y, double z);
+double			plane_intersection(t_p3 o, t_p3 d, t_figures *lst);
 
 double			square_intersection(t_p3 o, t_p3 d, t_figures *lst);
 
 double			triangle_intersection(t_p3 o, t_p3 d, t_figures *lst);
 
-double			cylinder_intersection(t_p3 o, t_p3 d ,t_figures *lst);
+double			cylinder_intersection(t_p3 o, t_p3 d, t_figures *lst);
 
 int				p_is_outside(t_p3 p1, t_p3 p2, t_p3 p3, t_p3 ip);
 
-int				next_cam(int keycode, t_scene *data);
+int				next_cam(int keycode, t_minilibx *mlx);
 
 int				ft_close(void *param);
 

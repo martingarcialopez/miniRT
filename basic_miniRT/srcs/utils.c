@@ -93,27 +93,28 @@ void		ft_addnewlst_back(t_figures **alst, t_figures** begin)
 	}
 }
 
-int			next_cam(int keycode, t_scene *data)
+int			next_cam(int keycode, t_minilibx *mlx)
 {
 	if (keycode == 53)
 		exit(0);
 	if (keycode != 49)
 		return (0);
-	if (data->cam->next)
+	if (mlx->cam->next)
 	{
-		data->cam = data->cam->next;
-		mlx_put_image_to_window(data->cam->mlx_ptr, data->cam->win_ptr, data->cam->img_ptr, 0, 0);
+		mlx->cam = mlx->cam->next;
+		mlx_put_image_to_window(mlx->mlx_ptr, mlx->win_ptr, mlx->cam->img_ptr, 0, 0);
 	}
 	else
 	{
-		data->cam = data->cam->begin;
-		mlx_put_image_to_window(data->cam->mlx_ptr, data->cam->win_ptr, data->cam->img_ptr, 0, 0);
+		mlx->cam = mlx->begin;
+		mlx_put_image_to_window(mlx->mlx_ptr, mlx->win_ptr, mlx->cam->img_ptr, 0, 0);
 	}
 	return (1);
 }
 
 int			ft_close(void *param)
 {
+	param = (void *)param;
 	exit(EXIT_SUCCESS);
 	return (1);
 }
@@ -142,4 +143,18 @@ void		usage(char *program_name)
 {
 	ft_printf("Usage: %s <scene.rt>\n", program_name);
 	exit(EXIT_FAILURE);
+}
+
+int			p_is_outside(t_p3 p1, t_p3 p2, t_p3 p3, t_p3 ip)
+{
+	t_p3	v1;
+	t_p3	v2;
+	t_p3	vp;
+
+	v1 = vsubstract(p2, p1);
+	v2 = vsubstract(p3, p1);
+	vp = vsubstract(ip, p1);
+	if (vcos(cross(v1, v2), cross(v1, vp)) < 0)
+		return (1);
+	return (0);
 }

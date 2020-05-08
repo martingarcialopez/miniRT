@@ -154,7 +154,7 @@ int	trace_ray(t_p3 O, t_p3 d, double min, t_scn data, t_lst *lst, int depth)
 
     r = closest_figure.reflective;
     if (depth <= 0 || r <= 0.0)
-	return (local_color);
+		return (local_color);
 
     reflected = reflect_ray(scal_x_vec(-1, d), normal);
     reflected_color = trace_ray(ip, reflected, 0.001, data, lst, depth - 1);
@@ -188,7 +188,7 @@ void	render_scene(void *mlx_ptr, void *win_ptr, t_scn data, t_lst *lst,
 			
 			//data.O = data.cam;
 
-			color = trace_ray(data.cam, d, 1, data, lst, 3);
+			color = trace_ray(data.cam, d, 0, data, lst, 3);
 			//color = trace_ray(O, data.nv, 1, data, lst, 3);
 
 			//mlx_pixel_put(mlx_ptr, win_ptr, i, j, color);
