@@ -59,9 +59,6 @@ static void			format_frac(t_float fl, char *buf, t_flags *f)
 
 static void			print_float(t_float fl, char *buf, t_flags *f)
 {
-	int i;
-
-	i = 0;
 	if (f->width && (fl.neg || f->flags & (FLAG_PLUS | FLAG_SPACE)))
 		f->width--;
 	if (!(f->flags & FLAG_LEFT))

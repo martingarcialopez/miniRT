@@ -42,7 +42,8 @@
 ** # define OWNERGRABBUTTONMASK (1L<<24)
 */
 
-# define KEYPRESSMASK 1
+# define KEYPRESSMASK (1L<<0)
+# define STRUCTURENOTIFYMASK (1L << 17)
 
 # define KEYPRESS 2
 # define KEYRELEASE 3

@@ -13,8 +13,8 @@
 #ifndef _MINIRT_H_
 # define _MINIRT_H_
 
-#include <OpenGL/gl3.h>
 #include "mlx.h"
+#include "ggl_mlx_define.h"
 #include "libft.h"
 #include "libvct.h"
 #include "figures.h"
@@ -38,6 +38,7 @@
 
 typedef struct		s_camera
 {
+	int				idx;
     t_p3			o;
     t_p3			nv;
     int				fov;
@@ -86,6 +87,36 @@ typedef struct		s_minilibx
 	t_camera		*begin;
 }					t_minilibx;
 
+typedef struct		s_inter
+{
+	int				color;
+	t_p3			normal;
+	t_p3			p;
+}					t_inter;
+
+typedef struct		s_bmp_header
+{
+	char			type[2];	
+	unsigned int	size;
+	unsigned int	reserved;
+	unsigned int	offset;
+}					t_bmphead;
+
+typedef struct		s_dib_header
+{
+	unsigned int	size;
+	int				width;
+	int				height;
+	unsigned short	colplanes;
+	unsigned short	bpp;
+	unsigned int	compression;	
+	unsigned int	img_size;
+	int				x_ppm;
+	int				y_ppm;
+	unsigned int	color_number;
+	unsigned int	important_color;
+}					t_dibhead;
+
 char			*readfile(char *str, int fd);
 
 int				stoi(char **str);
@@ -96,8 +127,7 @@ void			ft_addnewlst_back(t_figures **alst, t_figures **begin);
 
 void			parse_scene(t_minilibx *mlx, t_scene *data, t_figures **lst, char **av);
 
-void			compute_light(int *color, t_p3 p, t_p3 normal, t_scene data, t_figures *lst,
-		double (*fun_ptr[NUM_FIGS])(t_p3, t_p3, t_figures *));
+void			compute_light(t_inter *inter, t_scene data, t_figures *lst, double (*fun_ptr[NUM_FIGS])(t_p3, t_p3, t_figures *));
 
 int 			color_x_light(int color, double rgb[3]);
 
@@ -121,6 +151,8 @@ int				p_is_outside(t_p3 p1, t_p3 p2, t_p3 p3, t_p3 ip);
 
 int				next_cam(int keycode, t_minilibx *mlx);
 
+void			do_the_bmp_thing(t_minilibx mlx, t_scene data, char *name);
+
 int				ft_close(void *param);
 
 void			*ec_malloc(unsigned int size);
@@ -128,5 +160,7 @@ void			*ec_malloc(unsigned int size);
 void			usage(char *program_name);
 
 void			fatal(char *message);
+
+void			scene_error(char *message);
 
 #endif

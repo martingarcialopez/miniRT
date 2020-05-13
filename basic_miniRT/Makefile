@@ -18,12 +18,32 @@ RM		= rm -f
 
 CFLAGS	= -Wall -Wextra -I $(HEAD)
 
-FLAGS	= -framework OpenGL -framework AppKit
+
+#######${CC} ${CFLAGS} ${FLAGS} $(OBJS) -L $(LIB)libft -lft -L $(LIB)libvector -lvct -L $(LIB)minilibx_opengl_20191021 -lmlx -o ${NAME}
+
+
+
+
+FLAGS = -L $(LIB)libft -lft -L $(LIB)libvector -lvct
+
+MACOS_FLAGS	= -L $(LIB)minilibx_opengl_20191021 -lmlx -framework OpenGL -framework AppKit 
+
+LINUX_FLAGS = -L $(LIB)minilibx-linux -lmlx -lm -lX11 -lXext 
+
+UNAME := $(shell uname)
+ifeq ($(UNAME),Darwin)
+	FLAGS += $(MACOS_FLAGS)
+endif
+ifeq ($(UNAME),Linux)
+	FLAGS += $(LINUX_FLAGS)
+endif
+
 
 ${NAME}:	${OBJS}
 			make -C $(LIB)libft
 			make -C $(LIB)libvector
-			${CC} ${CFLAGS} ${FLAGS} $(OBJS) -L $(LIB)libft -lft -L $(LIB)libvector -lvct -L $(LIB)minilibx_opengl_20191021 -lmlx -o ${NAME}
+###	${CC} ${CFLAGS}  $(OBJS) -lm -lX11 -lXext -L $(LIB)libft -lft -L $(LIB)libvector -lvct -L $(LIB)minilibx-linux -lmlx -o ${NAME}
+			${CC} ${CFLAGS}  $(OBJS) $(FLAGS) -o ${NAME}
 
 all:		${NAME}
 

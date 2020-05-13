@@ -26,8 +26,6 @@ double		pl_intersection(t_p3 o, t_p3 d, t_p3 plane_p, t_p3 plane_nv)
 
 double		plane_intersection(t_p3 o, t_p3 d, t_figures *lst)
 {
-	//if (vsin(d, lst->normal) > 0)
-	//	lst->normal = scal_x_vec(-1, lst->normal);
 	return (pl_intersection(o, d, lst->fig.pl.p, lst->normal));
 }
 
@@ -40,7 +38,6 @@ double		sphere_intersection(t_p3 o, t_p3 d, t_figures *lst)
 	double	k3;
 	double	x1;
 	double	x2;
-	//double	ip;
 
 	oc = vsubstract(o, lst->fig.sp.c);
 	k1 = dot(d, d);
@@ -51,13 +48,6 @@ double		sphere_intersection(t_p3 o, t_p3 d, t_figures *lst)
 	x2 = (-k2 - sqrt(disc)) / (2 * k1);
 	if (disc < 0)
 		return (INFINITY);
-	//lst->normal = normalize(vsubstract(vadd(o,
-	//				scal_x_vec(x1 < x2 ? x1 : x2, d)), lst->fig.sp.c));
-	/*else
-	{
-		ip = vadd(o, scal_x_vec(x1 < x2 ? x1 : x2, d));
-		lst->normal = normalize(vsubstract(ip, lst.fig.sp.c));
-	}*/
 	else if (disc == 0)
 		return (x1);
 	else
@@ -111,6 +101,8 @@ double		cylinder_intersection(t_p3 o, t_p3 d, t_figures *lst)
 	double	k1;
 	double	k2;
 	double	r;
+	double	dist;
+	double	x;
 	double	x1;
 	double	x2;
 
@@ -121,17 +113,46 @@ double		cylinder_intersection(t_p3 o, t_p3 d, t_figures *lst)
 	disc = (k2 * pow(r, 2)) - (dot(lst->fig.cy.nv, lst->fig.cy.nv) * pow(dot(vsubstract(lst->fig.cy.c, o), d_x_a), 2));
 	x1 = (k1 + sqrt(disc)) / k2;
 	x2 = (k1 - sqrt(disc)) / k2;
+	
+//	x = x1 < x2 ? x1 : x2;
+
+	if (disc < 0 || mod(d_x_a) == 0)
+		return (INFINITY);
+
 	lst->fig.cy.dist1 = dot(lst->fig.cy.nv, vsubstract(scal_x_vec(x1, d), vsubstract(lst->fig.cy.c, o)));
 	lst->fig.cy.dist2 = dot(lst->fig.cy.nv, vsubstract(scal_x_vec(x2, d), vsubstract(lst->fig.cy.c, o)));
 	//if (mod(cross(d, lst->fig.cy.nv)) == 0)
 	//	return (x1);
 	if (!((lst->fig.cy.dist1 > 0 && lst->fig.cy.dist1 < lst->fig.cy.h) || (lst->fig.cy.dist2 > 0 && lst->fig.cy.dist2 < lst->fig.cy.h)))
 		return (INFINITY);
-	if (x1 < x2)
+	
+	if ((lst->fig.cy.dist1 > 0 && lst->fig.cy.dist1 < lst->fig.cy.h) && (lst->fig.cy.dist2 > 0 && lst->fig.cy.dist2 < lst->fig.cy.h))
+	{
+		dist = x1 < x2 ? lst->fig.cy.dist1 : lst->fig.cy.dist2;
+		x = x1 < x2 ? x1 : x2;
+	}
+	else if (lst->fig.cy.dist1 > 0 && lst->fig.cy.dist1 < lst->fig.cy.h)
+	{
+		dist = lst->fig.cy.dist1;
+		x = x1;
+	}
+	else if (lst->fig.cy.dist2 > 0 && lst->fig.cy.dist2 < lst->fig.cy.h)
+	{
+		dist = lst->fig.cy.dist2;
+		x = x2;
+	}
+
+
+/*
+	if (x1 < x2 && lst->fig.cy.dist1 > 0 && lst->fig.cy.dist1 < lst->fig.cy.h)
 		lst->normal = normalize(vsubstract(vsubstract(scal_x_vec(x1, d), scal_x_vec(lst->fig.cy.dist1, lst->fig.cy.nv)), vsubstract(lst->fig.cy.c, o)));
-	else
-		lst->normal = normalize(vsubstract(vsubstract(scal_x_vec(x1, d), scal_x_vec(lst->fig.cy.dist2, lst->fig.cy.nv)), vsubstract(lst->fig.cy.c, o)));
+	else 
+		lst->normal = normalize(vsubstract(vsubstract(scal_x_vec(x2, d), scal_x_vec(lst->fig.cy.dist2, lst->fig.cy.nv)), vsubstract(lst->fig.cy.c, o)));
+*/
+
+	lst->normal = normalize(vsubstract(vsubstract(scal_x_vec(x, d), scal_x_vec(dist, lst->fig.cy.nv)), vsubstract(lst->fig.cy.c, o)));
 	//if (vcos(d, lst->normal) < 0)
 	//	lst->normal = scal_x_vec(-1, lst->normal);
-	return (x1 < x2 ? x1 : x2);
+//	return (x1 < x2 && lst->fig.cy.dist1 > 0 && lst->fig.cy.dist2 < lst->fig.cy.h? x1 : x2);
+	return (x);
 }
