@@ -70,6 +70,27 @@ void	try_all_intersections(t_p3 o, t_p3 d, double min, t_figures *lst, t_figures
 	}
 }
 
+int		apply_texture(t_p3 coords)
+{
+		int black = 0x000000;
+		int	white = 0xffffff;
+		int	x = abs((int)floor(coords.x));
+		int	y = abs((int)floor(coords.y));
+		int z = abs((int)floor(coords.z));
+		int	a;
+		int	b;
+		int	c;
+		int	party_mix;
+
+		a = x % 2;
+		b = y % 2;
+		c = z % 2;
+
+		party_mix = (a ^ b) ^ c;	
+
+		return (party_mix ? black : white);
+}
+
 int	trace_ray(t_p3 o, t_p3 d, double min, t_scene data, t_figures *lst, int depth)
 {
 	double		(*fun_ptr[NUM_FIGS])(t_p3, t_p3, t_figures *) = {
@@ -93,8 +114,9 @@ int	trace_ray(t_p3 o, t_p3 d, double min, t_scene data, t_figures *lst, int dept
 	closest_intersection = INFINITY;
 	closest_figure.flag = -1;
 	try_all_intersections(o, d, min, lst, &closest_figure, &closest_intersection, fun_ptr);
-	local_color = closest_figure.flag != -1 ? closest_figure.color : data.background;
+//	local_color = closest_figure.flag != -1 ? closest_figure.color : data.background;
 	intersection_point = vadd(o, scal_x_vec(closest_intersection, d));
+	local_color = closest_figure.flag != -1 ? closest_figure.texture == 1 ? apply_texture(intersection_point) : closest_figure.color : data.background;
 	calc_normal(intersection_point, d, &normal, closest_figure);
 	compute_light(o, &local_color, intersection_point, normal, data, lst, fun_ptr);
 
@@ -115,7 +137,7 @@ int		calc_ray(int n, int i, int j, int xres, int yres, t_minilibx mlx, t_scene d
 
 	d = set_camera(n, i, j, mlx, xres, yres);
 	d = look_at(d, mlx.cam->nv);
-	color = trace_ray(mlx.cam->o, d, 0.0, data, lst, 3);	
+	color = trace_ray(mlx.cam->o, d, 0.0, data, lst, 2);	
 	return (color);
 }
 /*
@@ -407,27 +429,109 @@ void			wrapp_data(t_minilibx mlx, t_scene data, t_figures *lst, t_wrapper *wrapp
 		i++;
 	}
 }
-
-void		do_the_bmp_thing(t_minilibx mlx, char *name)
+int			create_file(char *name)
 {
 	char	*bmpname;
+	int		path;
 	int		fd;
 	int		i;
 	int		j;
 
-	bmpname = (char *)ec_malloc(strlen(name) + 1);
+	path = 0;
+	bmpname = (char *)ec_malloc(ft_strlen(name) + 1);
 	i = 0;
-	while (name[i] && name[i] != '/')
-		i++;
-	i++;
+	while (name[i])
+		if (name[i++] == '/')
+			path++;
+	i = 0;
+	while (path && name[i])
+		if (name[i++] == '/')
+			path--;
 	j = 0;
 	while (name[i] && name[i] != '.')
 		bmpname[j++] = name[i++];
 	bmpname[j] = '\0';
-	strcat(bmpname, ".bmp");
+	ft_strcat(bmpname, ".bmp");
 	if(!((fd = open(bmpname, O_WRONLY | O_CREAT | O_TRUNC, S_IRUSR | S_IWUSR)) > 0))
 		fatal("in do_the_bmp_thing() while creating file");
+	
+	return (fd);
+}
 
+void		create_header(t_scene data, t_bmphead *header, t_dibhead *dib)
+{
+	header->type[0] = 0x42;
+	header->type[1] = 0x4D;
+	header->size = (data.xres * data.yres * 4) + 54;
+	header->reserved = 0x00000000;
+	header->offset = 0x36;
+
+	dib->size = 40;
+	dib->width = data.xres;
+	dib->height = -data.yres;
+	dib->colplanes = 1;
+	dib->bpp = 32;
+	dib->compression = 0;
+	dib->img_size = (data.xres * data.yres * 4);
+	dib->x_ppm = 2835;
+	dib->y_ppm = 2835;
+	dib->color_number = 0;
+	dib->important_color = 0;
+}
+
+void		write_header(int fd, t_bmphead header, t_dibhead dib)
+{
+	write(fd, &header.type, 2);
+	write(fd, &header.size, 4);
+	write(fd, &header.reserved, 4);
+	write(fd, &header.offset, 4);
+
+	write(fd, &dib.size, 4);
+	write(fd, &dib.width, 4);
+	write(fd, &dib.height, 4);
+	write(fd, &dib.colplanes, 2);
+	write(fd, &dib.bpp, 2);
+	write(fd, &dib.compression, 4);
+	write(fd, &dib.img_size, 4);
+	write(fd, &dib.x_ppm, 4);
+	write(fd, &dib.y_ppm, 4);
+	write(fd, &dib.color_number, 4);
+	write(fd, &dib.important_color, 4);
+}
+void		write_file(int fd, t_scene data, t_minilibx mlx)
+{
+	char	pixel_array[mlx.cam->size_line * data.yres];
+	int		image_size;
+	int		i;
+	int		j;
+
+	image_size = data.xres * data.yres;
+	i = 0;
+	j = 0;
+	while (i < image_size)
+	{
+		pixel_array[j++] = mlx.cam->px_img[i] & 255; // B
+		pixel_array[j++] = (mlx.cam->px_img[i] & 255 << 8) >> 8; // G
+		pixel_array[j++] = (mlx.cam->px_img[i] & 255 << 16) >> 16; // R
+		pixel_array[j++] = 0;
+		i++;
+	}
+	write(fd, pixel_array, mlx.cam->size_line * data.yres);
+}
+
+void		do_the_bmp_thing(t_minilibx mlx, t_scene data, char *name)
+{
+	t_bmphead	header;
+	t_dibhead	dib;
+	int			fd;
+	int			i;
+	int			j;
+
+	fd = create_file(name);
+	create_header(data, &header, &dib);
+	write_header(fd, header, dib);
+	write_file(fd, data, mlx);	
+	close(fd);
 	//ahora solo tienes que llenar el puto bmp
 }
 
@@ -460,7 +564,7 @@ int			main(int ac, char **av)
 	mlx.cam = mlx.begin;
 	if (ac == 3)
 	{
-		do_the_bmp_thing(mlx, av[1]);
+		do_the_bmp_thing(mlx, data, av[1]);
 		exit(0);
 	}
 	mlx_put_image_to_window (mlx.mlx_ptr, mlx.win_ptr, mlx.cam->img_ptr, 0, 0);

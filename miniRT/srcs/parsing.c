@@ -124,6 +124,8 @@ void		parse_cylinder(t_figures **elem, t_figures **begin, char **str)
 	next(str);
 	lst->refr_idx = stof(str);
 	next(str);
+	lst->texture = stoi(str);
+	next(str);
 	lst->color = parse_color(str); 
 }
 
@@ -177,6 +179,8 @@ void		parse_sphere(t_figures **elem, t_figures **begin, char **str)
 	next(str);
 	lst->refr_idx = stof(str);
 	next(str);
+	lst->texture = stoi(str);
+	next(str);
 	lst->color = parse_color(str);
 }
 
@@ -201,6 +205,8 @@ void		parse_square(t_figures **elem, t_figures **begin, char **str)
 	next(str);
 	lst->refr_idx = stof(str);
 	next(str);
+	lst->texture = stoi(str);
+	next(str);
 	lst->color = parse_color(str);
 }
 
@@ -222,6 +228,8 @@ void		parse_plane(t_figures **elem, t_figures **begin, char **str)
 	lst->refl_idx = stof(str);
 	next(str);
 	lst->refr_idx = stof(str);
+	next(str);
+	lst->texture = stoi(str);
 	next(str);
 	lst->color = parse_color(str);
 }
@@ -247,6 +255,8 @@ void		parse_triangle(t_figures **elem, t_figures **begin, char **str)
 	lst->refl_idx = stof(str);
 	next(str);
 	lst->refr_idx = stof(str);
+	next(str);
+	lst->texture = stoi(str);
 	next(str);
 	lst->color = parse_color(str);
 }
