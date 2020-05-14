@@ -26,7 +26,7 @@ LINUX_MACRO = -D LINUX
 
 MACOS_FLAGS	= -L $(LIB)minilibx_opengl_20191021 -lmlx -framework OpenGL -framework AppKit 
 
-LINUX_FLAGS = -L $(LIB)minilibx-linux -lmlx -lm -lX11 -lXext 
+LINUX_FLAGS = -D LINUX -L $(LIB)minilibx-linux -lmlx -lm -lX11 -lXext 
 
 UNAME := $(shell uname)
 ifeq ($(UNAME),Darwin)
@@ -42,7 +42,7 @@ endif
 ${NAME}:	${OBJS}
 			make -C $(LIB)libft
 			make -C $(LIB)libvector
-			${CC} ${CFLAGS} $(FLAGS) $(OBJS) -o ${NAME}
+			${CC} ${CFLAGS} $(OBJS) $(FLAGS) -o ${NAME}
 
 all:		${NAME}
 
@@ -58,4 +58,4 @@ fclean:		clean
 
 re:			fclean all
 
-.PHONY:		all clean fclean re
+PHONY:		all clean fclean re
