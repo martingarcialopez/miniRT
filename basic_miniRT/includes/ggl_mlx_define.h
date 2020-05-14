@@ -146,8 +146,11 @@
 ** PT_KEY is the point (.) and angle bracket closing (>) key
 ** SL_KEY is the slash (/) and question mark (?) key
 */
-
-# define SP_KEY 49
+# ifdef LINUX
+#  define SP_KEY 32
+# else
+#  define SP_KEY 49
+# endif
 # define BQ_KEY 50
 # define MN_KEY 27
 # define PL_KEY 24
@@ -208,7 +211,11 @@
 ** CLR_KEY is the clear key
 */
 
+# ifdef MACOS
+#  define ESC_KEY 53
+# else
 # define ESC_KEY 65307
+# endif
 # define TAB_KEY 48
 # define CL_KEY 272
 # define LSFT_KEY 65505

@@ -111,10 +111,10 @@ void	render_scene(t_minilibx mlx, t_scene data, t_figures *lst)
 			mlx.cam->px_img[j * (mlx.cam->size_line / 4) + i] = color;
 			i++;
 		}
-		if (j % 10 == 0 && mlx.cam->idx == 1)
+		if (/*j % 10 == 0 &&*/ mlx.cam->idx == 1)
 			ft_printf( "\rRendering scene... [%d%%]", 100 * j / data.yres);
-		else if ( j % 10 == 0) 
-			ft_printf("\rRendering cam %d... [%d%%]",mlx.cam->idx, 100 * j / data.yres);
+		else /*if ( j % 10 == 0) */
+			ft_printf("\rRendering cam %d... [%d%%]", mlx.cam->idx, 100 * j / data.yres);
 		j++;
 	}
 	if (mlx.cam->idx == 1)
@@ -130,9 +130,12 @@ void	init_mlx(t_minilibx *mlx, t_scene *data)
 	int			y_displayres;
 
 	mlx->mlx_ptr = mlx_init();
-	mlx_get_screen_size(mlx->mlx_ptr, &x_displayres, &y_displayres);
-	data->xres = data->xres < x_displayres ? data->xres : x_displayres;
-	data->yres = data->yres < y_displayres ? data->yres : y_displayres;
+	if (ft_strcmp(stringizer(OS_NAME), "MACOS") == 0)
+	{
+		mlx_get_screen_size(mlx->mlx_ptr, &x_displayres, &y_displayres);
+		data->xres = data->xres < x_displayres ? data->xres : x_displayres;
+		data->yres = data->yres < y_displayres ? data->yres : y_displayres;
+	}
 	mlx->win_ptr = mlx_new_window(mlx->mlx_ptr, data->xres, data->yres, "basic miniRT");
 	cam_begin = mlx->cam;
 	mlx->begin = mlx->cam;
@@ -156,7 +159,7 @@ int		main(int ac, char **av)
 		usage(av[0]);
 	if (ac == 3 && ft_strcmp(av[2], "--save"))
 		scene_error("invalid argument\n");
-	
+
 	parse_scene(&mlx, &data, &lst, av);
 	init_mlx(&mlx, &data);
 	while (mlx.cam)

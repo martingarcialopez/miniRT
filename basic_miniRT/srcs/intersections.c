@@ -101,8 +101,8 @@ double		cylinder_intersection(t_p3 o, t_p3 d, t_figures *lst)
 	double	k1;
 	double	k2;
 	double	r;
-	double	dist;
-	double	x;
+	double	dist = 0.0;
+	double	x = 0.0;
 	double	x1;
 	double	x2;
 
@@ -136,7 +136,7 @@ double		cylinder_intersection(t_p3 o, t_p3 d, t_figures *lst)
 		dist = lst->fig.cy.dist1;
 		x = x1;
 	}
-	else if (lst->fig.cy.dist2 > 0 && lst->fig.cy.dist2 < lst->fig.cy.h)
+	else
 	{
 		dist = lst->fig.cy.dist2;
 		x = x2;

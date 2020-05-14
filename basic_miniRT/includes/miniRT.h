@@ -13,6 +13,22 @@
 #ifndef _MINIRT_H_
 # define _MINIRT_H_
 
+
+#define stringizer(x) str(x)
+#define str(x) (#x)
+
+# ifdef MACOS
+#  define OS_NAME darwin
+# endif
+
+# ifdef LINUX
+#  define OS_NAME linux
+# endif
+
+#ifndef OS_NAME
+# define OS_NAME unknown
+#endif
+
 #include "mlx.h"
 #include "ggl_mlx_define.h"
 #include "libft.h"

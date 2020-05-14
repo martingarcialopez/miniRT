@@ -187,8 +187,6 @@ void		do_the_bmp_thing(t_minilibx mlx, t_scene data, char *name)
 	t_bmphead	header;
 	t_dibhead	dib;
 	int			fd;
-	int			i;
-	int			j;
 
 	fd = create_file(name);
 	create_header(data, &header, &dib);
@@ -202,7 +200,7 @@ int			next_cam(int keycode, t_minilibx *mlx)
 {
 	if (keycode == ESC_KEY)
 		exit(0);
-	if (keycode != 32)
+	if (keycode != SP_KEY)
 		return (0);
 	if (mlx->cam->next)
 	{
@@ -273,3 +271,11 @@ int			p_is_outside(t_p3 p1, t_p3 p2, t_p3 p3, t_p3 ip)
 		return (1);
 	return (0);
 }
+
+#ifndef LINUX
+int	mlx_get_screen_size(void *mlx_ptr, int *sizex, int *sizey)
+{
+	*((int*)mlx_ptr) = *sizex = *sizey;
+	return (0);
+}
+#endif

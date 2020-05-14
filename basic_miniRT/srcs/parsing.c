@@ -112,6 +112,7 @@ void		parse_camera(t_minilibx *mlx, char **str, int *init)
 
 	if (*init == 0)
 		*init = 1;
+	prev_idx = 0;
 	begin = mlx->cam;
 	list = mlx->cam;
 	elem = ec_malloc(sizeof(t_camera));
