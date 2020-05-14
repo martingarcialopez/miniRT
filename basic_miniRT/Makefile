@@ -26,7 +26,7 @@ LINUX_MACRO = -D LINUX
 
 MACOS_FLAGS	= -L $(LIB)minilibx_opengl_20191021 -lmlx -framework OpenGL -framework AppKit 
 
-LINUX_FLAGS = -D LINUX -L $(LIB)minilibx-linux -lmlx -lm -lX11 -lXext 
+LINUX_FLAGS = -L $(LIB)minilibx-linux -lmlx -lm -lX11 -lXext 
 
 UNAME := $(shell uname)
 ifeq ($(UNAME),Darwin)
