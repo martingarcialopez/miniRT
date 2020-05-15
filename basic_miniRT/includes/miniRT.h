@@ -169,7 +169,7 @@ int				next_cam(int keycode, t_minilibx *mlx);
 
 void			do_the_bmp_thing(t_minilibx mlx, t_scene data, char *name);
 
-int				ft_close(void *param);
+int				close_program(void *param);
 
 void			*ec_malloc(unsigned int size);
 
