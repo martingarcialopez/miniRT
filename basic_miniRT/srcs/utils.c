@@ -53,4 +53,3 @@ int			p_is_outside(t_p3 p1, t_p3 p2, t_p3 p3, t_p3 ip)
 		return (1);
 	return (0);
 }
-
