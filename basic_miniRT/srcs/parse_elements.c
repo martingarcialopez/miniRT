@@ -1,14 +1,25 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   parse_elements.c                                   :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: mgarcia- <mgarcia-@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2020/05/15 13:49:05 by mgarcia-          #+#    #+#             */
+/*   Updated: 2020/05/15 13:51:55 by mgarcia-         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "miniRT.h"
 
 void		parse_sphere(t_figures **elem, t_figures **begin, char **str)
 {
-	t_figures   *lst;
+	t_figures	*lst;
 
 	ft_addnewlst_back(elem, begin);
 	lst = *elem;
 	while (lst->next)
 		lst = lst->next;
-	//lst->flag = 0;
 	lst->flag = SP;
 	next(str);
 	lst->fig.sp.c = parse_p3(str);
@@ -20,8 +31,8 @@ void		parse_sphere(t_figures **elem, t_figures **begin, char **str)
 
 void		parse_plane(t_figures **elem, t_figures **begin, char **str)
 {
-	t_figures   *lst;
-	
+	t_figures	*lst;
+
 	ft_addnewlst_back(elem, begin);
 	lst = *elem;
 	while (lst->next)
@@ -36,8 +47,8 @@ void		parse_plane(t_figures **elem, t_figures **begin, char **str)
 
 void		parse_square(t_figures **elem, t_figures **begin, char **str)
 {
-	t_figures   *lst;
-	
+	t_figures	*lst;
+
 	ft_addnewlst_back(elem, begin);
 	lst = *elem;
 	while (lst->next)
@@ -75,7 +86,7 @@ void		parse_triangle(t_figures **elem, t_figures **begin, char **str)
 void		parse_cylinder(t_figures **elem, t_figures **begin, char **str)
 {
 	t_figures	*lst;
-	
+
 	ft_addnewlst_back(elem, begin);
 	lst = *elem;
 	while (lst->next)
@@ -91,5 +102,5 @@ void		parse_cylinder(t_figures **elem, t_figures **begin, char **str)
 	lst->fig.cy.h = stof(str);
 	in_range(lst->fig.cy.h, 0, INFINITY, "cylinder");
 	next(str);
-	lst->color = parse_color(str); 
+	lst->color = parse_color(str);
 }

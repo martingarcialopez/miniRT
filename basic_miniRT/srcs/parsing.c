@@ -6,17 +6,22 @@
 /*   By: mgarcia- <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/01/21 11:31:29 by mgarcia-          #+#    #+#             */
-/*   Updated: 2020/03/12 21:31:36 by mgarcia-         ###   ########.fr       */
+/*   Updated: 2020/05/15 13:59:18 by mgarcia-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "miniRT.h"
 
-void	parse_elems(t_minilibx *mlx, t_scene *data, t_figures **lst, t_figures **begin, char *str)
+void	parse_elems(t_minilibx *mlx, t_scene *data, t_figures **lst,
+												t_figures **begin, char *str)
 {
-	int		res_init = 0;
-	int		al_init = 0;
-	int		cam_init = 0;
+	int		res_init;
+	int		al_init;
+	int		cam_init;
+
+	res_init = 0;
+	al_init = 0;
+	cam_init = 0;
 	while (*str)
 	{
 		if (*str == '#')
@@ -57,7 +62,6 @@ void	parse_scene(t_minilibx *mlx, t_scene *data, t_figures **lst, char **av)
 	*lst = NULL;
 	data->l = NULL;
 	mlx->cam = NULL;
-
 	write(1, "Parsing scene...\n", 17);
 	str = (char *)ec_malloc(sizeof(char) * (BUFSIZE + 1));
 	if ((fd = open(av[1], 0)) == -1)

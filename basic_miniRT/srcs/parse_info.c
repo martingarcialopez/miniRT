@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   parse_info.c                                       :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: mgarcia- <mgarcia-@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2020/05/15 13:52:59 by mgarcia-          #+#    #+#             */
+/*   Updated: 2020/05/15 13:54:03 by mgarcia-         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "miniRT.h"
 
 void		parse_res(t_scene *data, char **str, int *init)
@@ -6,7 +18,6 @@ void		parse_res(t_scene *data, char **str, int *init)
 		scene_error("Resolution (R) can only be declared once in the scene\n");
 	else
 		*init = 1;
-
 	next(str);
 	data->xres = stoi(str);
 	in_range(data->xres, 1, INFINITY, "resolution");
@@ -18,10 +29,10 @@ void		parse_res(t_scene *data, char **str, int *init)
 void		parse_ambient_light(t_scene *data, char **str, int *init)
 {
 	if (*init > 0)
-		scene_error("Ambient lightning (A) can only be declared once in the scene\n");
+		scene_error(
+			"Ambient lightning (A) can only be declared once in the scene\n");
 	else
 		*init = 1;
-
 	data->al_color = 0;
 	next(str);
 	data->ambient_light = stof(str);
@@ -48,7 +59,7 @@ void		parse_camera(t_minilibx *mlx, char **str, int *init)
 	{
 		while (list->next)
 			list = list->next;
-		prev_idx = list->idx;	
+		prev_idx = list->idx;
 		list->next = elem;
 	}
 	else
