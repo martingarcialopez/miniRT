@@ -58,7 +58,7 @@ double		stof(char **str)
 	if (**str == '.')
 		(*str)++;
 	d = 0.0;
-	while(ft_isdigit(**str))
+	while (ft_isdigit(**str))
 		d = d * 10 + (*((*str)++) - '0');
 	while (d > 1)
 		d /= 10;
@@ -66,16 +66,16 @@ double		stof(char **str)
 	return (d * neg);
 }
 
-void		ft_addnewlst_back(t_figures **alst, t_figures** begin)
+void		ft_addnewlst_back(t_figures **alst, t_figures **begin)
 {
-	t_figures   *elem;
-	t_figures   *list;
+	t_figures	*elem;
+	t_figures	*list;
 
 	list = *alst;
 	if (!(elem = malloc(sizeof(t_figures))))
 	{
 		printf("goorbai\n");
-		exit (1);
+		exit(EXIT_FAILURE);
 	}
 	elem->next = NULL;
 	if (list)
@@ -114,9 +114,9 @@ int			create_file(char *name)
 		bmpname[j++] = name[i++];
 	bmpname[j] = '\0';
 	ft_strcat(bmpname, ".bmp");
-	if(!((fd = open(bmpname, O_WRONLY | O_CREAT | O_TRUNC, S_IRUSR | S_IWUSR)) > 0))
+	if (!((fd = open(bmpname,
+				O_WRONLY | O_CREAT | O_TRUNC, S_IRUSR | S_IWUSR)) > 0))
 		fatal("in do_the_bmp_thing() while creating file");
-	
 	return (fd);
 }
 
@@ -127,7 +127,6 @@ void		create_header(t_scene data, t_bmphead *header, t_dibhead *dib)
 	header->size = (data.xres * data.yres * 4) + 54;
 	header->reserved = 0x00000000;
 	header->offset = 0x36;
-
 	dib->size = 40;
 	dib->width = data.xres;
 	dib->height = -data.yres;
@@ -147,7 +146,6 @@ void		write_header(int fd, t_bmphead header, t_dibhead dib)
 	write(fd, &header.size, 4);
 	write(fd, &header.reserved, 4);
 	write(fd, &header.offset, 4);
-
 	write(fd, &dib.size, 4);
 	write(fd, &dib.width, 4);
 	write(fd, &dib.height, 4);
@@ -168,14 +166,14 @@ void		write_file(int fd, t_scene data, t_minilibx mlx)
 	int		i;
 	int		j;
 
-	image_size = data.xres * data.yres; 
+	image_size = data.xres * data.yres;
 	i = 0;
 	j = 0;
 	while (i < image_size)
 	{
-		pixel_array[j++] = mlx.cam->px_img[i] & 255; // B
-		pixel_array[j++] = (mlx.cam->px_img[i] & 255 << 8) >> 8; // G
-		pixel_array[j++] = (mlx.cam->px_img[i] & 255 << 16) >> 16; // R
+		pixel_array[j++] = mlx.cam->px_img[i] & 255;
+		pixel_array[j++] = (mlx.cam->px_img[i] & 255 << 8) >> 8;
+		pixel_array[j++] = (mlx.cam->px_img[i] & 255 << 16) >> 16;
 		pixel_array[j++] = 0;
 		i++;
 	}
@@ -193,7 +191,6 @@ void		do_the_bmp_thing(t_minilibx mlx, t_scene data, char *name)
 	write_header(fd, header, dib);
 	write_file(fd, data, mlx);
 	close(fd);
-	//ahora solo tienes que llenar el puto bmp
 }
 
 int			next_cam(int keycode, t_minilibx *mlx)
@@ -205,12 +202,14 @@ int			next_cam(int keycode, t_minilibx *mlx)
 	if (mlx->cam->next)
 	{
 		mlx->cam = mlx->cam->next;
-		mlx_put_image_to_window(mlx->mlx_ptr, mlx->win_ptr, mlx->cam->img_ptr, 0, 0);
+		mlx_put_image_to_window(
+				mlx->mlx_ptr, mlx->win_ptr, mlx->cam->img_ptr, 0, 0);
 	}
 	else
 	{
 		mlx->cam = mlx->begin;
-		mlx_put_image_to_window(mlx->mlx_ptr, mlx->win_ptr, mlx->cam->img_ptr, 0, 0);
+		mlx_put_image_to_window(
+				mlx->mlx_ptr, mlx->win_ptr, mlx->cam->img_ptr, 0, 0);
 	}
 	return (1);
 }
@@ -225,7 +224,7 @@ int			ft_close(void *param)
 void		fatal(char *message)
 {
 	char error_message[100];
-	
+
 	ft_strcpy(error_message, "[!!] Fatal Error ");
 	ft_strncat(error_message, message, 83);
 	perror(error_message);
@@ -245,7 +244,7 @@ void		scene_error(char *message)
 void		*ec_malloc(unsigned int size)
 {
 	void *ptr;
- 
+
 	ptr = malloc(size);
 	if (ptr == NULL)
 		fatal("in malloc() on memory allocation");
@@ -273,9 +272,11 @@ int			p_is_outside(t_p3 p1, t_p3 p2, t_p3 p3, t_p3 ip)
 }
 
 #ifndef LINUX
-int	mlx_get_screen_size(void *mlx_ptr, int *sizex, int *sizey)
+
+int			mlx_get_screen_size(void *mlx_ptr, int *sizex, int *sizey)
 {
-	*((int*)mlx_ptr) = *sizex = *sizey;
+	mlx_ptr = (int*)mlx_ptr;
+	sizex = sizey;
 	return (0);
 }
 #endif
