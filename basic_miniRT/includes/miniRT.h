@@ -13,9 +13,16 @@
 #ifndef _MINIRT_H_
 # define _MINIRT_H_
 
-
-#define stringizer(x) str(x)
-#define str(x) (#x)
+#include "mlx.h"
+#include "ggl_mlx_define.h"
+#include "libft.h"
+#include "libvct.h"
+#include "figures.h"
+#include <fcntl.h>
+#include <stdlib.h>
+#include <math.h>
+#include <pthread.h>
+#include <stdio.h>
 
 # ifdef MACOS
 #  define OS_NAME darwin
@@ -29,18 +36,8 @@
 # define OS_NAME unknown
 #endif
 
-#include "mlx.h"
-#include "ggl_mlx_define.h"
-#include "libft.h"
-#include "libvct.h"
-#include "figures.h"
-#include <fcntl.h>
-#include <stdlib.h>
-#include <math.h>
-#include <pthread.h>
-
-#include <unistd.h>
-#include <stdio.h>
+#define stringizer(x) str(x)
+#define str(x) (#x)
 
 #define BUFSIZE	32
 
@@ -83,8 +80,6 @@ typedef struct		s_scene
 	int				al_color;
 	int				background;
 }					t_scene;
-
-t_p3			normalize(t_p3 p);
 
 typedef struct		s_figures
 {
@@ -133,27 +128,58 @@ typedef struct		s_dib_header
 	unsigned int	important_color;
 }					t_dibhead;
 
+/*
+**			 	Parsing functions
+*/
+
+void			parse_scene(t_minilibx *mlx, t_scene *data, t_figures **lst, char **av);
+
+void			parse_res(t_scene *data, char **str, int *init);
+
+void			parse_ambient_light(t_scene *data, char **str, int *init);
+
+void			parse_camera(t_minilibx *mlx, char **str, int *init);
+
+void			parse_light(t_scene **data, char **str);
+
+void			parse_sphere(t_figures **elem, t_figures **begin, char **str);
+
+void			parse_plane(t_figures **elem, t_figures **begin, char **str);
+
+void			parse_square(t_figures **elem, t_figures **begin, char **str);
+
+void			parse_triangle(t_figures **elem, t_figures **begin, char **str);
+
+void			parse_cylinder(t_figures **elem, t_figures **begin, char **str);
+
+/*
+**				Parsing help functions
+*/
+
 char			*readfile(char *str, int fd);
 
 int				stoi(char **str);
 
 double			stof(char **str);
 
+void			in_range(double nb, double min, double max, char *function);
+
+void			next(char **str);
+
+void			comma(char **str);
+
+t_p3			parse_p3(char **str);
+
+int				parse_color(char **str);
+
 void			ft_addnewlst_back(t_figures **alst, t_figures **begin);
 
-void			parse_scene(t_minilibx *mlx, t_scene *data, t_figures **lst, char **av);
-
-void			compute_light(t_inter *inter, t_scene data, t_figures *lst, double (*fun_ptr[NUM_FIGS])(t_p3, t_p3, t_figures *));
-
-int 			color_x_light(int color, double rgb[3]);
-
-void			calc_normal(t_p3 p, t_p3 d, t_p3 *normal, t_figures lst);
-
-int				is_lit(t_p3 O, t_p3 d, t_figures *lst, double (*fun_ptr[NUM_FIGS])(t_p3, t_p3, t_figures *));
+/*
+**				Intersection functions
+*/
+double			sphere_intersection(t_p3 O, t_p3 d, t_figures *lst);
 
 double			pl_intersection(t_p3 o, t_p3 d, t_p3 plane_p, t_p3 plane_nv);
-
-double			sphere_intersection(t_p3 O, t_p3 d, t_figures *lst);
 
 double			plane_intersection(t_p3 o, t_p3 d, t_figures *lst);
 
@@ -163,20 +189,48 @@ double			triangle_intersection(t_p3 o, t_p3 d, t_figures *lst);
 
 double			cylinder_intersection(t_p3 o, t_p3 d, t_figures *lst);
 
+/*
+**				Intersections help functions
+*/
+
 int				p_is_outside(t_p3 p1, t_p3 p2, t_p3 p3, t_p3 ip);
 
-int				next_cam(int keycode, t_minilibx *mlx);
+/*
+**				Ray tracing help functions functions
+*/
 
-void			do_the_bmp_thing(t_minilibx mlx, t_scene data, char *name);
+void			calc_normal(t_p3 p, t_p3 d, t_p3 *normal, t_figures lst);
 
-int				close_program(void *param);
+int				is_lit(t_p3 O, t_p3 d, t_figures *lst, double (*fun_ptr[NUM_FIGS])(t_p3, t_p3, t_figures *));
+
+void			compute_light(t_inter *inter, t_scene data, t_figures *lst, double (*fun_ptr[NUM_FIGS])(t_p3, t_p3, t_figures *));
+
+int 			color_x_light(int color, double rgb[3]);
+
+/*
+**				Error handling functions
+*/
 
 void			*ec_malloc(unsigned int size);
-
-void			usage(char *program_name);
 
 void			fatal(char *message);
 
 void			scene_error(char *message);
+
+void			usage(char *program_name);
+
+/*
+**				Minilibx events
+*/
+
+int				next_cam(int keycode, t_minilibx *mlx);
+
+int				close_program(void *param);
+
+/*
+**				Bmp exporter
+*/
+
+void			do_the_bmp_thing(t_minilibx mlx, t_scene data, char *name);
 
 #endif

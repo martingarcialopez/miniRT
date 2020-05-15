@@ -8,11 +8,14 @@ LIB		= lib/
 
 FILES	=	minirt.c \
 			parsing.c \
+			parse_info.c \
+			parse_elements.c \
 			intersections.c \
 			concerning_light.c \
 			bmp_exporter.c \
 			error_handling.c \
 			parsing_utils.c \
+			parsing_utils2.c \
 			utils.c
 
 SRCS	= $(addprefix $(SRCDIR), $(FILES))
