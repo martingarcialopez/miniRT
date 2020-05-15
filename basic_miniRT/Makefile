@@ -6,7 +6,14 @@ SRCDIR	= srcs/
 
 LIB		= lib/
 
-FILES	= minirt.c parsing.c concerning_light.c intersections.c utils.c
+FILES	=	minirt.c \
+			parsing.c \
+			intersections.c \
+			concerning_light.c \
+			bmp_exporter.c \
+			error_handling.c \
+			parsing_utils.c \
+			utils.c
 
 SRCS	= $(addprefix $(SRCDIR), $(FILES))
 
@@ -29,6 +36,7 @@ MACOS_FLAGS	= -L $(LIB)minilibx_opengl_20191021 -lmlx -framework OpenGL -framewo
 LINUX_FLAGS = -L $(LIB)minilibx-linux -lmlx -lm -lX11 -lXext 
 
 UNAME := $(shell uname)
+
 ifeq ($(UNAME),Darwin)
 	CFLAGS += $(MACOS_MACRO)
 	FLAGS += $(MACOS_FLAGS)
@@ -37,7 +45,6 @@ ifeq ($(UNAME),Linux)
 	CFLAGS += $(LINUX_MACRO)
 	FLAGS += $(LINUX_FLAGS)
 endif
-
 
 ${NAME}:	${OBJS}
 			make -C $(LIB)libft

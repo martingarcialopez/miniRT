@@ -176,7 +176,7 @@ int		main(int ac, char **av)
 	}
 	ft_printf("Scene successfully rendered, press ESC at any moment to close the program.\nIf the scene has several cameras, press space to change between them\n");
 	mlx_put_image_to_window (mlx.mlx_ptr, mlx.win_ptr, mlx.cam->img_ptr, 0, 0);
-	mlx_hook(mlx.win_ptr, DESTROYNOTIFY, STRUCTURENOTIFYMASK, ft_close, (void *)0);
+	mlx_hook(mlx.win_ptr, DESTROYNOTIFY, STRUCTURENOTIFYMASK, close_program, (void *)0);
 	mlx_hook(mlx.win_ptr, KEYPRESS, KEYPRESSMASK, next_cam, &mlx);
 	mlx_loop(mlx.mlx_ptr);
 	
