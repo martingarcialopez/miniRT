@@ -18,7 +18,6 @@ void		next(char **str)
 		(*str)++;
 }
 
-
 void		comma(char **str)
 {
 	if (**str != ',')

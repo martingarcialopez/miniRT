@@ -57,8 +57,6 @@ void				calc_normal(t_p3 p, t_p3 d, t_p3 *normal, t_figures l)
 		*normal = normalize(vsubstract(p, l.fig.sp.c));
 		*normal = vcos(d, l.normal) > 0 ? scal_x_vec(-1, *normal) : *normal;
 	}
-//	else if (l.flag == CY)
-//	*normal = l.normal;
 }
 
 int					is_lit(t_p3 o, t_p3 d, t_figures *lst,
