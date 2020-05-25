@@ -45,50 +45,28 @@ t_p3	look_at(t_p3 d, t_p3 cam_nv)
 	rotated.x = d.x * x_axis.x + d.y * x_axis.y + d.z * x_axis.z;
 	rotated.y = d.x * y_axis.x + d.y * y_axis.y + d.z * y_axis.z;
 	rotated.z = d.x * z_axis.x + d.y * z_axis.y + d.z * z_axis.z;
-	rotated.x *= -1;
 	rotated.z *= -1;
 	return (rotated);
 }
 
-void	try_all_intersections(t_p3 o, t_p3 d, t_figures *lst, t_figures *closest_figure, double
-		*closest_intersection, double (*fun_ptr[NUM_FIGS])(t_p3, t_p3, t_figures *))
-{
-	double	intersection_distance;
-
-	while (lst)
-	{
-		intersection_distance = (fun_ptr[lst->flag])(o, d, lst);
-		if (intersection_distance < *closest_intersection)
-		{
-			*closest_figure = *lst;
-			*closest_intersection = intersection_distance;
-		}
-		lst = lst->next;
-	}
-}
-
 int		trace_ray(t_p3 o, t_p3 d, t_scene data, t_figures *lst)
 {
-	double		(*fun_ptr[NUM_FIGS])(t_p3, t_p3, t_figures *) = {
-				&sphere_intersection,
-				&plane_intersection,
-				&square_intersection,
-				&triangle_intersection,
-				&cylinder_intersection };
-	
+	t_v3		ray;
 	t_figures	closest_figure;
 	double		closest_intersection;
 	t_inter		inter;
 
+	ray.o = o;
+	ray.d = d;
 	inter.color = 0x000000;
-	data.background = 0x202020;
+	data.bgr = 0x202020;
 	closest_intersection = INFINITY;
 	closest_figure.flag = -1;
-	try_all_intersections(o, d, lst, &closest_figure, &closest_intersection, fun_ptr);
-	inter.color = closest_figure.flag != -1 ? closest_figure.color : data.background;
+	try_all_intersections(ray, lst, &closest_figure, &closest_intersection);
+	inter.color = closest_figure.flag != -1 ? closest_figure.color : data.bgr;
 	inter.p = vadd(o, scal_x_vec(closest_intersection, d));
 	calc_normal(inter.p, d, &(inter.normal), closest_figure);
-	compute_light(&inter, data, lst, fun_ptr);
+	compute_light(&inter, data, lst);
 	return (inter.color);
 }
 
@@ -106,47 +84,17 @@ void	render_scene(t_minilibx mlx, t_scene data, t_figures *lst)
 		while (i < data.xres)
 		{
 			d = set_camera(i, j, mlx, data);
-			d = look_at(d, mlx.cam->nv);	
+			d = look_at(d, mlx.cam->nv);
 			color = trace_ray(mlx.cam->o, d, data, lst);
 			mlx.cam->px_img[j * (mlx.cam->size_line / 4) + i] = color;
 			i++;
 		}
-		if (/*j % 10 == 0 &&*/ mlx.cam->idx == 1)
-			ft_printf( "\rRendering scene... [%d%%]", 100 * j / data.yres);
-		else /*if ( j % 10 == 0) */
-			ft_printf("\rRendering cam %d... [%d%%]", mlx.cam->idx, 100 * j / data.yres);
+		ft_printf("\rRendering scene... (cam %d/%d) [%d%%]",
+							mlx.cam->idx, data.cam_nb, 100 * j / data.yres);
 		j++;
 	}
-	if (mlx.cam->idx == 1)
-		ft_printf("\rRendering scene... [100%%]\n");
-	else
-		ft_printf("\rRendering cam %d... [100%%]\n", mlx.cam->idx);
-}
-
-void	init_mlx(t_minilibx *mlx, t_scene *data)
-{
-	t_camera	*cam_begin;
-	int			x_displayres;
-	int			y_displayres;
-
-	mlx->mlx_ptr = mlx_init();
-	if (ft_strcmp(stringizer(OS_NAME), "MACOS") == 0)
-	{
-		mlx_get_screen_size(mlx->mlx_ptr, &x_displayres, &y_displayres);
-		data->xres = data->xres < x_displayres ? data->xres : x_displayres;
-		data->yres = data->yres < y_displayres ? data->yres : y_displayres;
-	}
-	mlx->win_ptr = mlx_new_window(mlx->mlx_ptr, data->xres, data->yres, "basic miniRT");
-	cam_begin = mlx->cam;
-	mlx->begin = mlx->cam;
-	while (mlx->cam)
-	{
-		mlx->cam->img_ptr = mlx_new_image(mlx->mlx_ptr, data->xres, data->yres);
-		mlx->cam->px_img = (int *)mlx_get_data_addr(mlx->cam->img_ptr,
-				&mlx->cam->bits_per_pixel, &mlx->cam->size_line, &mlx->cam->endian);
-		mlx->cam = mlx->cam->next;
-	}
-	mlx->cam = cam_begin;
+	ft_printf("\rRendering scene... (cam %d/%d) [100%%]\n",
+												mlx.cam->idx, data.cam_nb);
 }
 
 int		main(int ac, char **av)
@@ -159,7 +107,6 @@ int		main(int ac, char **av)
 		usage(av[0]);
 	if (ac == 3 && ft_strcmp(av[2], "--save"))
 		scene_error("invalid argument\n");
-
 	parse_scene(&mlx, &data, &lst, av);
 	init_mlx(&mlx, &data);
 	while (mlx.cam)
@@ -171,15 +118,10 @@ int		main(int ac, char **av)
 	if (ac == 3)
 	{
 		do_the_bmp_thing(mlx, data, av[1]);
-		ft_printf("Scene successfully rendered and saved to bmp\n");
+		success_message(ac);
 		exit(EXIT_SUCCESS);
 	}
-	ft_printf("Scene successfully rendered, press ESC at any moment to close the program.\nIf the scene has several cameras, press space to change between them\n");
-	mlx_put_image_to_window (mlx.mlx_ptr, mlx.win_ptr, mlx.cam->img_ptr, 0, 0);
-	mlx_hook(mlx.win_ptr, DESTROYNOTIFY, STRUCTURENOTIFYMASK, close_program, (void *)0);
-	mlx_hook(mlx.win_ptr, KEYPRESS, KEYPRESSMASK, next_cam, &mlx);
-	mlx_loop(mlx.mlx_ptr);
-	
+	success_message(ac);
+	graphic_loop(mlx);
 	return (0);
-
 }

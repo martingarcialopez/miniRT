@@ -66,11 +66,13 @@ double		stof(char **str)
 	return (d * neg);
 }
 
-void		ft_addnewlst_back(t_figures **alst, t_figures **begin)
+void		ft_addnewlst_back(t_figures **alst)
 {
+	t_figures	*begin;
 	t_figures	*elem;
 	t_figures	*list;
 
+	begin = *alst;
 	list = *alst;
 	elem = ec_malloc(sizeof(t_figures));
 	elem->next = NULL;
@@ -81,8 +83,6 @@ void		ft_addnewlst_back(t_figures **alst, t_figures **begin)
 		list->next = elem;
 	}
 	else
-	{
-		*alst = elem;
-		*begin = elem;
-	}
+		begin = elem;
+	*alst = begin;
 }

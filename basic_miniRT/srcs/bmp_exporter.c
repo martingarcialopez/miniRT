@@ -21,7 +21,7 @@ int			create_file(char *name)
 	int		j;
 
 	path = 0;
-	bmpname = (char *)ec_malloc(ft_strlen(name) + 1);
+	bmpname = (char *)ec_malloc(ft_strlen(name) + 8);
 	i = 0;
 	while (name[i])
 		if (name[i++] == '/')
@@ -30,13 +30,13 @@ int			create_file(char *name)
 	while (path && name[i])
 		if (name[i++] == '/')
 			path--;
-	j = 0;
+	ft_strcat(bmpname, "images/");
+	j = 7;
 	while (name[i] && name[i] != '.')
 		bmpname[j++] = name[i++];
 	bmpname[j] = '\0';
 	ft_strcat(bmpname, ".bmp");
-	if (!((fd = open(bmpname,
-				O_WRONLY | O_CREAT | O_TRUNC, S_IRUSR | S_IWUSR)) > 0))
+	if (!((fd = open(bmpname, FILE_CREATE_FLAGS)) > 0))
 		fatal("in do_the_bmp_thing() while creating file");
 	return (fd);
 }

@@ -40,16 +40,52 @@ int			next_cam(int keycode, t_minilibx *mlx)
 	return (1);
 }
 
-int			p_is_outside(t_p3 p1, t_p3 p2, t_p3 p3, t_p3 ip)
+void		init_mlx(t_minilibx *mlx, t_scene *data)
 {
-	t_p3	v1;
-	t_p3	v2;
-	t_p3	vp;
+	t_camera	*cam_begin;
+	int			x_displayres;
+	int			y_displayres;
 
-	v1 = vsubstract(p2, p1);
-	v2 = vsubstract(p3, p1);
-	vp = vsubstract(ip, p1);
-	if (vcos(cross(v1, v2), cross(v1, vp)) < 0)
-		return (1);
-	return (0);
+	mlx->mlx_ptr = mlx_init();
+	if (ft_strcmp(stringizer(OS_NAME), "MACOS") == 0)
+	{
+		mlx_get_screen_size(mlx->mlx_ptr, &x_displayres, &y_displayres);
+		data->xres = data->xres < x_displayres ? data->xres : x_displayres;
+		data->yres = data->yres < y_displayres ? data->yres : y_displayres;
+	}
+	mlx->win_ptr = mlx_new_window(mlx->mlx_ptr, data->xres, data->yres,
+															"basic miniRT");
+	cam_begin = mlx->cam;
+	mlx->begin = mlx->cam;
+	while (mlx->cam)
+	{
+		mlx->cam->img_ptr = mlx_new_image(mlx->mlx_ptr, data->xres, data->yres);
+		mlx->cam->px_img = (int *)mlx_get_data_addr(mlx->cam->img_ptr,
+			&mlx->cam->bits_per_pixel, &mlx->cam->size_line, &mlx->cam->endian);
+		mlx->cam = mlx->cam->next;
+	}
+	mlx->cam = cam_begin;
+}
+
+void		success_message(int ac)
+{
+	if (ac == 2)
+	{
+		ft_printf("\nScene successfully rendered, press ESC at any moment ");
+		ft_printf("to close the program.\nIf the scene has several cameras, ");
+		ft_printf("press space to change between them\n\n");
+	}
+	else
+	{
+		ft_printf("\nScene successfully saved to BMP\n");
+		ft_printf("The file has been saved into the \"images\" directory\n\n");
+	}
+}
+
+void		graphic_loop(t_minilibx mlx)
+{
+	mlx_put_image_to_window(mlx.mlx_ptr, mlx.win_ptr, mlx.cam->img_ptr, 0, 0);
+	mlx_hook(mlx.win_ptr, DESTROYNOTIFY, STRUCTURENOTIFYMASK, close_program, 0);
+	mlx_hook(mlx.win_ptr, KEYPRESS, KEYPRESSMASK, next_cam, &mlx);
+	mlx_loop(mlx.mlx_ptr);
 }

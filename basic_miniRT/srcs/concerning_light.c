@@ -24,8 +24,7 @@ void				add_coeficient(double (*rgb)[3], double coef, int color)
 	(*rgb)[2] += coef * (color & mask) / 255;
 }
 
-void				compute_light(t_inter *inter, t_scene data, t_figures *lst,
-					double (**fun_ptr)())
+void				compute_light(t_inter *inter, t_scene data, t_figures *lst)
 {
 	double			light;
 	double			rgb[3];
@@ -37,7 +36,7 @@ void				compute_light(t_inter *inter, t_scene data, t_figures *lst,
 	while (data.l)
 	{
 		direction = vsubstract(data.l->o, inter->p);
-		if (is_lit(inter->p, direction, lst, fun_ptr)
+		if (is_lit(inter->p, direction, lst)
 				&& dot(inter->normal, direction) > 0)
 		{
 			light = data.l->br * vcos(inter->normal, direction);
@@ -53,21 +52,26 @@ void				calc_normal(t_p3 p, t_p3 d, t_p3 *normal, t_figures l)
 	if ((l.flag == PL) || (l.flag == SQ) || (l.flag == TR) || (l.flag == CY))
 		*normal = vcos(d, l.normal) > 0 ? scal_x_vec(-1, l.normal) : l.normal;
 	else if (l.flag == SP)
-	{
 		*normal = normalize(vsubstract(p, l.fig.sp.c));
-		*normal = vcos(d, l.normal) > 0 ? scal_x_vec(-1, *normal) : *normal;
-	}
 }
 
-int					is_lit(t_p3 o, t_p3 d, t_figures *lst,
-		double (*fun_ptr[NUM_FIGS])(t_p3, t_p3, t_figures *))
+int					is_lit(t_p3 o, t_p3 d, t_figures *lst)
 {
 	double			in;
 
 	while (lst)
 	{
-		in = (fun_ptr[lst->flag])(o, d, lst);
-		if (in > 0.000001 && in < 1)
+		if (lst->flag == SP)
+			in = sphere_intersection(o, d, lst);
+		else if (lst->flag == PL)
+			in = plane_intersection(o, d, lst);
+		else if (lst->flag == TR)
+			in = triangle_intersection(o, d, lst);
+		else if (lst->flag == SQ)
+			in = square_intersection(o, d, lst);
+		else if (lst->flag == CY)
+			in = cylinder_intersection(o, d, lst);
+		if (in > EPSILON && in < 1)
 			return (0);
 		lst = lst->next;
 	}

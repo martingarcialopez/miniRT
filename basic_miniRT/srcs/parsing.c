@@ -12,16 +12,36 @@
 
 #include "miniRT.h"
 
-void	parse_elems(t_minilibx *mlx, t_scene *data, t_figures **lst,
-												t_figures **begin, char *str)
+void	parse(t_minilibx *mlx, t_scene *data, t_figures **lst, char **strptr)
 {
-	int		res_init;
-	int		al_init;
-	int		cam_init;
+	char	*str;
 
-	res_init = 0;
-	al_init = 0;
-	cam_init = 0;
+	str = *strptr;
+	if (*str == 'R' && *(str++))
+		parse_res(data, &str);
+	else if (*str == 'A' && *(str++))
+		parse_ambient_light(data, &str);
+	else if (*str == 'c' && (*(str + 1) == 32 || *(str + 1) == 9) && *(str++))
+		parse_camera(mlx, data, &str);
+	else if (*str == 'c' && *(str + 1) == 'y' && *(str++) && *(str++))
+		parse_cylinder(lst, &str);
+	else if (*str == 'l' && (*(str + 1) == 32 || *(str + 1) == 9) && *(str++))
+		parse_light(&data, &str);
+	else if (*str == 's' && *(str + 1) == 'p' && *(str++) && *(str++))
+		parse_sphere(lst, &str);
+	else if (*str == 's' && *(str + 1) == 'q' && *(str++) && *(str++))
+		parse_square(lst, &str);
+	else if (*str == 'p' && *(str + 1) == 'l' && *(str++) && *(str++))
+		parse_plane(lst, &str);
+	else if (*str == 't' && *(str + 1) == 'r' && *(str++) && *(str++))
+		parse_triangle(lst, &str);
+	*strptr = str;
+}
+
+void	parse_elems(t_minilibx *mlx, t_scene *data, t_figures **lst, char *str)
+{
+	data->res_init = 0;
+	data->al_init = 0;
 	while (*str)
 	{
 		if (*str == '#')
@@ -29,33 +49,16 @@ void	parse_elems(t_minilibx *mlx, t_scene *data, t_figures **lst,
 			while (*str && *str != '\n')
 				str++;
 		}
-		else if (*str == 'R' && *(str++))
-			parse_res(data, &str, &res_init);
-		else if (*str == 'A' && *(str++))
-			parse_ambient_light(data, &str, &al_init);
-		else if (*str == 'c' && (*(str + 1) == 32 || *(str + 1) == 9) && *(str++))
-			parse_camera(mlx, &str, &cam_init);
-		else if (*str == 'c' && *(str + 1) == 'y' && *(str++) && *(str++))
-			parse_cylinder(lst, begin, &str);
-		else if (*str == 'l' && (*(str + 1) == 32 || *(str + 1) == 9) && *(str++))
-			parse_light(&data, &str);
-		else if (*str == 's' && *(str + 1) == 'p' && *(str++) && *(str++))
-			parse_sphere(lst, begin, &str);
-		else if (*str == 's' && *(str + 1) == 'q' && *(str++) && *(str++))
-			parse_square(lst, begin, &str);
-		else if (*str == 'p' && *(str + 1) == 'l' && *(str++) && *(str++))
-			parse_plane(lst, begin, &str);
-		else if (*str == 't' && *(str + 1) == 'r' && *(str++) && *(str++))
-			parse_triangle(lst, begin, &str);
+		else
+			parse(mlx, data, lst, &str);
 		str++;
 	}
-	if (res_init == 0 || al_init == 0 || cam_init == 0)
+	if (data->res_init == 0 || data->al_init == 0 || mlx->cam == NULL)
 		scene_error("Not enough elements to render a scene\n");
 }
 
 void	parse_scene(t_minilibx *mlx, t_scene *data, t_figures **lst, char **av)
 {
-	t_figures	*begin;
 	char		*str;
 	int			fd;
 
@@ -67,6 +70,5 @@ void	parse_scene(t_minilibx *mlx, t_scene *data, t_figures **lst, char **av)
 	if ((fd = open(av[1], 0)) == -1)
 		fatal("while opening file");
 	str = readfile(str, fd);
-	parse_elems(mlx, data, lst, &begin, str);
-	*lst = begin;
+	parse_elems(mlx, data, lst, str);
 }

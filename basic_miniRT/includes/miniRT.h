@@ -47,10 +47,26 @@
 #define TR 3
 #define CY 4
 
+#define EPSILON 0.00001
+#define FILE_CREATE_FLAGS O_WRONLY | O_CREAT | O_TRUNC, S_IRUSR | S_IWUSR
 #define NUM_FIGS 5
+
+typedef struct		s_v3
+{
+	t_p3	o;
+	t_p3	d;
+}					t_v3;
+
+typedef struct		s_sq
+{
+	t_p3	half_size;
+	t_p3	floor;
+	t_p3	center_to_ip;
+}					t_sq;
 
 typedef struct		s_camera
 {
+	int				init;
 	int				idx;
     t_p3			o;
     t_p3			nv;
@@ -73,12 +89,15 @@ typedef struct		s_light
 
 typedef struct		s_scene
 {
+	int				res_init;
 	int				xres;
 	int				yres;
+	int				cam_nb;
 	t_light			*l;
+	int				al_init;
 	double			ambient_light;
 	int				al_color;
-	int				background;
+	int				bgr;
 }					t_scene;
 
 typedef struct		s_figures
@@ -134,23 +153,23 @@ typedef struct		s_dib_header
 
 void			parse_scene(t_minilibx *mlx, t_scene *data, t_figures **lst, char **av);
 
-void			parse_res(t_scene *data, char **str, int *init);
+void			parse_res(t_scene *data, char **str);
 
-void			parse_ambient_light(t_scene *data, char **str, int *init);
+void			parse_ambient_light(t_scene *data, char **str);
 
-void			parse_camera(t_minilibx *mlx, char **str, int *init);
+void			parse_camera(t_minilibx *mlx, t_scene *data, char **str);
 
 void			parse_light(t_scene **data, char **str);
 
-void			parse_sphere(t_figures **elem, t_figures **begin, char **str);
+void			parse_sphere(t_figures **elem, char **str);
 
-void			parse_plane(t_figures **elem, t_figures **begin, char **str);
+void			parse_plane(t_figures **elem, char **str);
 
-void			parse_square(t_figures **elem, t_figures **begin, char **str);
+void			parse_square(t_figures **elem, char **str);
 
-void			parse_triangle(t_figures **elem, t_figures **begin, char **str);
+void			parse_triangle(t_figures **elem, char **str);
 
-void			parse_cylinder(t_figures **elem, t_figures **begin, char **str);
+void			parse_cylinder(t_figures **elem, char **str);
 
 /*
 **				Parsing help functions
@@ -172,7 +191,7 @@ t_p3			parse_p3(char **str);
 
 int				parse_color(char **str);
 
-void			ft_addnewlst_back(t_figures **alst, t_figures **begin);
+void			ft_addnewlst_back(t_figures **alst);
 
 /*
 **				Intersection functions
@@ -193,7 +212,13 @@ double			cylinder_intersection(t_p3 o, t_p3 d, t_figures *lst);
 **				Intersections help functions
 */
 
+void			try_all_intersections(t_v3 ray, t_figures *lst, t_figures *clfig, double *clint);
+
 int				p_is_outside(t_p3 p1, t_p3 p2, t_p3 p3, t_p3 ip);
+
+int				solve_cylinder(double x[2], t_p3 o, t_p3 d, t_figures *lst);
+
+t_p3			calc_cy_normal(double x2[2], t_p3 o, t_p3 d, t_figures *lst);
 
 /*
 **				Ray tracing help functions functions
@@ -201,14 +226,14 @@ int				p_is_outside(t_p3 p1, t_p3 p2, t_p3 p3, t_p3 ip);
 
 void			calc_normal(t_p3 p, t_p3 d, t_p3 *normal, t_figures lst);
 
-int				is_lit(t_p3 O, t_p3 d, t_figures *lst, double (*fun_ptr[NUM_FIGS])(t_p3, t_p3, t_figures *));
+int				is_lit(t_p3 O, t_p3 d, t_figures *lst);
 
-void			compute_light(t_inter *inter, t_scene data, t_figures *lst, double (*fun_ptr[NUM_FIGS])(t_p3, t_p3, t_figures *));
+void			compute_light(t_inter *inter, t_scene data, t_figures *lst);
 
 int 			color_x_light(int color, double rgb[3]);
 
 /*
-**				Error handling functions
+**				Error handling functions and success message
 */
 
 void			*ec_malloc(unsigned int size);
@@ -219,9 +244,15 @@ void			scene_error(char *message);
 
 void			usage(char *program_name);
 
+void			success_message(int ac);
+
 /*
-**				Minilibx events
+**				Minilibx functions
 */
+
+void			init_mlx(t_minilibx *mlx, t_scene *data);
+
+void			graphic_loop(t_minilibx mlx);
 
 int				next_cam(int keycode, t_minilibx *mlx);
 

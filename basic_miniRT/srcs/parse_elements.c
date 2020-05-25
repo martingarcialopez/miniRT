@@ -12,11 +12,11 @@
 
 #include "miniRT.h"
 
-void		parse_sphere(t_figures **elem, t_figures **begin, char **str)
+void		parse_sphere(t_figures **elem, char **str)
 {
 	t_figures	*lst;
 
-	ft_addnewlst_back(elem, begin);
+	ft_addnewlst_back(elem);
 	lst = *elem;
 	while (lst->next)
 		lst = lst->next;
@@ -29,32 +29,30 @@ void		parse_sphere(t_figures **elem, t_figures **begin, char **str)
 	lst->color = parse_color(str);
 }
 
-void		parse_plane(t_figures **elem, t_figures **begin, char **str)
+void		parse_plane(t_figures **elem, char **str)
 {
 	t_figures	*lst;
 
-	ft_addnewlst_back(elem, begin);
+	ft_addnewlst_back(elem);
 	lst = *elem;
 	while (lst->next)
 		lst = lst->next;
-	lst->flag = 0;
-	lst->flag |= PL;
+	lst->flag = PL;
 	next(str);
 	lst->fig.pl.p = parse_p3(str);
 	lst->normal = normalize(parse_p3(str));
 	lst->color = parse_color(str);
 }
 
-void		parse_square(t_figures **elem, t_figures **begin, char **str)
+void		parse_square(t_figures **elem, char **str)
 {
 	t_figures	*lst;
 
-	ft_addnewlst_back(elem, begin);
+	ft_addnewlst_back(elem);
 	lst = *elem;
 	while (lst->next)
 		lst = lst->next;
-	lst->flag = 0;
-	lst->flag |= SQ;
+	lst->flag = SQ;
 	next(str);
 	lst->fig.sq.c = parse_p3(str);
 	lst->normal = normalize(parse_p3(str));
@@ -64,16 +62,15 @@ void		parse_square(t_figures **elem, t_figures **begin, char **str)
 	lst->color = parse_color(str);
 }
 
-void		parse_triangle(t_figures **elem, t_figures **begin, char **str)
+void		parse_triangle(t_figures **elem, char **str)
 {
 	t_figures	*lst;
 
-	ft_addnewlst_back(elem, begin);
+	ft_addnewlst_back(elem);
 	lst = *elem;
 	while (lst->next)
 		lst = lst->next;
-	lst->flag = 0;
-	lst->flag |= TR;
+	lst->flag = TR;
 	next(str);
 	lst->fig.tr.p1 = parse_p3(str);
 	lst->fig.tr.p2 = parse_p3(str);
@@ -83,16 +80,15 @@ void		parse_triangle(t_figures **elem, t_figures **begin, char **str)
 	lst->color = parse_color(str);
 }
 
-void		parse_cylinder(t_figures **elem, t_figures **begin, char **str)
+void		parse_cylinder(t_figures **elem, char **str)
 {
 	t_figures	*lst;
 
-	ft_addnewlst_back(elem, begin);
+	ft_addnewlst_back(elem);
 	lst = *elem;
 	while (lst->next)
 		lst = lst->next;
-	lst->flag = 0;
-	lst->flag |= CY;
+	lst->flag = CY;
 	next(str);
 	lst->fig.cy.c = parse_p3(str);
 	lst->fig.cy.nv = normalize(parse_p3(str));

@@ -60,14 +60,14 @@ int			parse_color(char **str)
 	g = 0;
 	b = 0;
 	r |= stoi(str);
-	in_range(r, 0, 255, "color must be in range [0, 255],");
+	in_range(r, 0, 255, "colors must be in range [0, 255],");
 	r <<= 16;
 	comma(str);
 	g |= stoi(str);
-	in_range(g, 0, 255, "color must be in range [0, 255],");
+	in_range(g, 0, 255, "colors must be in range [0, 255],");
 	g <<= 8;
 	comma(str);
 	b |= stoi(str);
-	in_range(b, 0, 255, "color must be in range [0, 255],");
+	in_range(b, 0, 255, "colors must be in range [0, 255],");
 	return (r | g | b);
 }

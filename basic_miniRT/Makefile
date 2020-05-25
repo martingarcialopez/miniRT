@@ -16,7 +16,8 @@ FILES	=	minirt.c \
 			error_handling.c \
 			parsing_utils.c \
 			parsing_utils2.c \
-			utils.c
+			utils.c \
+			utils2.c
 
 SRCS	= $(addprefix $(SRCDIR), $(FILES))
 
