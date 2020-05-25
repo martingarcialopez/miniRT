@@ -6,7 +6,7 @@
 /*   By: mgarcia- <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/01/20 08:42:41 by mgarcia-          #+#    #+#             */
-/*   Updated: 2020/03/12 19:56:50 by mgarcia-         ###   ########.fr       */
+/*   Updated: 2020/05/25 21:24:20 by mgarcia-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,16 +25,12 @@
 #include <stdio.h>
 
 # ifdef MACOS
-#  define OS_NAME darwin
+#  define OS_NAME 1
 # endif
 
 # ifdef LINUX
-#  define OS_NAME linux
+#  define OS_NAME 2
 # endif
-
-#ifndef OS_NAME
-# define OS_NAME unknown
-#endif
 
 #define stringizer(x) str(x)
 #define str(x) (#x)

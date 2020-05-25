@@ -6,7 +6,7 @@
 /*   By: mgarcia- <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/10 18:06:59 by mgarcia-          #+#    #+#             */
-/*   Updated: 2020/05/25 21:08:17 by mgarcia-         ###   ########.fr       */
+/*   Updated: 2020/05/25 21:24:33 by mgarcia-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,7 +47,7 @@ void		init_mlx(t_minilibx *mlx, t_scene *data)
 	int			y_displayres;
 
 	mlx->mlx_ptr = mlx_init();
-	if (ft_strcmp(stringizer(OS_NAME), "linux") == 0)
+	if (OS_NAME == 2)
 	{
 		mlx_get_screen_size(mlx->mlx_ptr, &x_displayres, &y_displayres);
 		data->xres = data->xres < x_displayres ? data->xres : x_displayres;
