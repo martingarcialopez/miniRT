@@ -88,8 +88,9 @@ double		cylinder_intersection(t_p3 o, t_p3 d, t_figures *lst)
 												vsubstract(lst->fig.cy.c, o)));
 	lst->fig.cy.dist2 = dot(lst->fig.cy.nv, vsubstract(scal_x_vec(x2[1], d),
 												vsubstract(lst->fig.cy.c, o)));
-	if (!((lst->fig.cy.dist1 > 0 && lst->fig.cy.dist1 < lst->fig.cy.h)
-			|| (lst->fig.cy.dist2 > 0 && lst->fig.cy.dist2 < lst->fig.cy.h)))
+	if (!((lst->fig.cy.dist1 >= 0 && lst->fig.cy.dist1 <= lst->fig.cy.h
+					&& x2[0] > EPSILON) || (lst->fig.cy.dist2 >= 0
+					&& lst->fig.cy.dist2 <= lst->fig.cy.h && x2[0] > EPSILON)))
 		return (INFINITY);
 	lst->normal = calc_cy_normal(x2, o, d, lst);
 	return (x2[0]);

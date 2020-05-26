@@ -66,19 +66,25 @@ int			p_is_outside(t_p3 p1, t_p3 p2, t_p3 p3, t_p3 ip)
 
 int			solve_cylinder(double x[2], t_p3 o, t_p3 d, t_figures *lst)
 {
-	double	disc;
-	t_p3	d_x_a;
-	double	k1;
-	double	k2;
+	t_p3	v;
+	t_p3	u;
+	double	a;
+	double	b;
+	double	c;
 
-	d_x_a = cross(d, lst->fig.cy.nv);
-	k1 = dot(d_x_a, cross(vsubstract(lst->fig.cy.c, o), lst->fig.cy.nv));
-	k2 = dot(d_x_a, d_x_a);
-	disc = (k2 * pow(lst->fig.cy.r, 2)) - (dot(lst->fig.cy.nv, lst->fig.cy.nv)
-						* pow(dot(vsubstract(lst->fig.cy.c, o), d_x_a), 2));
-	x[0] = (k1 + sqrt(disc)) / k2;
-	x[1] = (k1 - sqrt(disc)) / k2;
-	if (disc < 0 || mod(d_x_a) == 0)
+	v = scal_x_vec(dot(d, lst->fig.cy.nv), lst->fig.cy.nv);
+	v = vsubstract(d, v);
+	u = scal_x_vec(dot(vsubstract(o, lst->fig.cy.c), lst->fig.cy.nv),
+													lst->fig.cy.nv);
+	u = vsubstract(vsubstract(o, lst->fig.cy.c), u);
+	a = dot(v, v);
+	b = 2 * dot(v, u);
+	c = dot(u, u) - pow(lst->fig.cy.r, 2);
+	x[0] = (-b + sqrt(pow(b, 2) - 4 * a * c)) / (2 * a);
+	x[1] = (-b - sqrt(pow(b, 2) - 4 * a * c)) / (2 * a);
+	if (x[0] != x[0] && x[1] != x[1])
+		return (0);
+	if (x[0] < EPSILON && x[1] < EPSILON)
 		return (0);
 	return (1);
 }
@@ -88,13 +94,15 @@ t_p3		calc_cy_normal(double x2[2], t_p3 o, t_p3 d, t_figures *lst)
 	double	dist;
 	double	x;
 
-	if ((lst->fig.cy.dist1 > 0 && lst->fig.cy.dist1 < lst->fig.cy.h)
-			&& (lst->fig.cy.dist2 > 0 && lst->fig.cy.dist2 < lst->fig.cy.h))
+	if ((lst->fig.cy.dist1 >= 0 && lst->fig.cy.dist1 <= lst->fig.cy.h
+				&& x2[0] > EPSILON) && (lst->fig.cy.dist2 >= 0
+				&& lst->fig.cy.dist2 <= lst->fig.cy.h && x2[1] > EPSILON))
 	{
 		dist = x2[0] < x2[1] ? lst->fig.cy.dist1 : lst->fig.cy.dist2;
 		x = x2[0] < x2[1] ? x2[0] : x2[1];
 	}
-	else if (lst->fig.cy.dist1 > 0 && lst->fig.cy.dist1 < lst->fig.cy.h)
+	else if (lst->fig.cy.dist1 >= 0 && lst->fig.cy.dist1 <= lst->fig.cy.h
+														&& x2[0] > EPSILON)
 	{
 		dist = lst->fig.cy.dist1;
 		x = x2[0];

@@ -22,7 +22,8 @@ t_p3	set_camera(int i, int j, t_minilibx mlx, t_scene data)
 	correct_fov = tan((mlx.cam->fov * M_PI / 180) / 2);
 	p.x = ((2 * ((i + 0.5) / data.xres)) - 1) * img_asp_ratio * correct_fov;
 	p.y = (1 - (2 * ((j + 0.5) / data.yres))) * correct_fov;
-	p.z = -1;
+	p.x *= -1;
+	p.z = 1;
 	normalize(p);
 	return (p);
 }
@@ -38,14 +39,13 @@ t_p3	look_at(t_p3 d, t_p3 cam_nv)
 	tmp = vdefine(0, 1, 0);
 	z_axis = cam_nv;
 	if (cam_nv.y == 1 || cam_nv.y == -1)
-		x_axis = vdefine(1, 0, 0);
+		x_axis = cam_nv.y == 1 ? vdefine(1, 0, 0) : vdefine(-1, 0, 0);
 	else
 		x_axis = cross(tmp, z_axis);
 	y_axis = cross(z_axis, x_axis);
 	rotated.x = d.x * x_axis.x + d.y * x_axis.y + d.z * x_axis.z;
 	rotated.y = d.x * y_axis.x + d.y * y_axis.y + d.z * y_axis.z;
 	rotated.z = d.x * z_axis.x + d.y * z_axis.y + d.z * z_axis.z;
-	rotated.z *= -1;
 	return (rotated);
 }
 
