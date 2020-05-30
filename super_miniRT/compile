@@ -1,1 +1,0 @@
-gcc -g -lpthread -I minilibx_opengl_20191021 -framework OpenGL -framework AppKit miniRT.c parsing.c vector_operations.c concerning_light.c intersections.c libmlx.a libft.a -o miniRT
