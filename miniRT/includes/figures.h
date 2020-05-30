@@ -13,7 +13,7 @@
 #ifndef _FIGURES_H_
 # define _FIGURES_H_
 
-#include "miniRT.h"
+#include "minirt.h"
 
 typedef struct	s_sphere
 {

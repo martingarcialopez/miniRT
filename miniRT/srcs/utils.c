@@ -6,192 +6,87 @@
 /*   By: mgarcia- <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/10 18:06:59 by mgarcia-          #+#    #+#             */
-/*   Updated: 2020/03/12 16:04:47 by mgarcia-         ###   ########.fr       */
+/*   Updated: 2020/05/25 21:24:33 by mgarcia-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "miniRT.h"
+#include "minirt.h"
 
-char		*readfile(char *str, int fd)
-{
-	char	buf[BUFSIZE + 1];
-	char	*ptr;
-	int		ret;
-	int		bol;
-
-	bol = 0;
-	while ((ret = read(fd, buf, BUFSIZE)) > 0)
-	{
-		ptr = str;
-		buf[ret] = '\0';
-		if (!(str = ft_strjoin(str, buf)))
-			return (NULL);
-		free(ptr);
-	}
-	return (str);
-}
-
-int			stoi(char **str)
-{
-	int i;
-	int	neg;
-
-	i = 0;
-	neg = 1;
-	if (**str == '-' && *((*str)++))
-		neg = -1;
-	while (ft_isdigit(**str))
-		i = i * 10 + (*((*str)++) - '0');
-	return (i * neg);
-}
-
-double		stof(char **str)
-{
-	int		w;
-	double	d;
-	int		neg;
-
-	w = 0;
-	neg = 1;
-	if (**str == '-' && *((*str)++))
-		neg = -1;
-	while (ft_isdigit(**str))
-		w = w * 10 + (*((*str)++) - '0');
-	if (**str == '.')
-		(*str)++;
-	d = 0.0;
-	while(ft_isdigit(**str))
-		d = d * 10 + (*((*str)++) - '0');
-	while (d > 1)
-		d /= 10;
-	d += w;
-	return (d * neg);
-}
-
-void		ft_addnewlst_back(t_figures **alst, t_figures** begin)
-{
-	t_figures   *elem;
-	t_figures   *list;
-
-	list = *alst;
-	if (!(elem = malloc(sizeof(t_figures))))
-	{
-		printf("goorbai\n");
-		exit (1);
-	}
-	elem->next = NULL;
-	if (list)
-	{
-		while (list->next)
-			list = list->next;
-		list->next = elem;
-	}
-	else
-	{
-		*alst = elem;
-		*begin = elem;
-	}
-}
-
-int			next_cam(int keycode, t_minilibx *mlx)
-{
-	if (keycode == 53)
-		exit(0);
-	if (keycode != 49)
-		return (0);
-	if (mlx->cam->next)
-	{
-		mlx->cam = mlx->cam->next;
-		mlx_put_image_to_window(mlx->mlx_ptr, mlx->win_ptr, mlx->cam->img_ptr, 0, 0);
-	}
-	else
-	{
-		mlx->cam = mlx->begin;
-		mlx_put_image_to_window(mlx->mlx_ptr, mlx->win_ptr, mlx->cam->img_ptr, 0, 0);
-	}
-	return (1);
-}
-
-int			ft_close(void *param)
+int			close_program(void *param)
 {
 	param = (void *)param;
 	exit(EXIT_SUCCESS);
 	return (1);
 }
 
-void		fatal(char *message)
+int			next_cam(int keycode, t_minilibx *mlx)
 {
-	char error_message[100];
-	
-	ft_strcpy(error_message, "[!!] Fatal Error ");
-	ft_strncat(error_message, message, 83);
-	perror(error_message);
-	exit(EXIT_FAILURE);
+	if (keycode == ESC_KEY)
+		exit(0);
+	if (keycode != SP_KEY)
+		return (0);
+	if (mlx->cam->next)
+	{
+		mlx->cam = mlx->cam->next;
+		mlx_put_image_to_window(
+				mlx->mlx_ptr, mlx->win_ptr, mlx->cam->img_ptr, 0, 0);
+	}
+	else
+	{
+		mlx->cam = mlx->begin;
+		mlx_put_image_to_window(
+				mlx->mlx_ptr, mlx->win_ptr, mlx->cam->img_ptr, 0, 0);
+	}
+	return (1);
 }
 
-void		*ec_malloc(unsigned int size)
+void		init_mlx(t_minilibx *mlx, t_scene *data)
 {
-	void *ptr;
- 
-	ptr = malloc(size);
-	if (ptr == NULL)
-		fatal("in malloc() on memory allocation");
-	return (ptr);
+	t_camera	*cam_begin;
+	int			x_displayres;
+	int			y_displayres;
+
+	mlx->mlx_ptr = mlx_init();
+	if (OS_NAME == 2)
+	{
+		mlx_get_screen_size(mlx->mlx_ptr, &x_displayres, &y_displayres);
+		data->xres = data->xres < x_displayres ? data->xres : x_displayres;
+		data->yres = data->yres < y_displayres ? data->yres : y_displayres;
+	}
+	mlx->win_ptr = mlx_new_window(mlx->mlx_ptr, data->xres, data->yres,
+															"basic miniRT");
+	cam_begin = mlx->cam;
+	mlx->begin = mlx->cam;
+	while (mlx->cam)
+	{
+		mlx->cam->img_ptr = mlx_new_image(mlx->mlx_ptr, data->xres, data->yres);
+		mlx->cam->px_img = (int *)mlx_get_data_addr(mlx->cam->img_ptr,
+			&mlx->cam->bits_per_pixel, &mlx->cam->size_line, &mlx->cam->endian);
+		mlx->cam = mlx->cam->next;
+	}
+	mlx->cam = cam_begin;
 }
 
-void		usage(char *program_name)
+void		success_message(int ac)
 {
-	ft_printf("Usage: %s <scene.rt>\n", program_name);
-	exit(EXIT_FAILURE);
+	if (ac == 2)
+	{
+		ft_printf("\nScene successfully rendered, press ESC at any moment ");
+		ft_printf("to close the program.\nIf the scene has several cameras, ");
+		ft_printf("press space to change between them\n\n");
+	}
+	else
+	{
+		ft_printf("\nScene successfully saved to BMP\n");
+		ft_printf("The file has been saved into the \"images\" directory\n\n");
+		exit(EXIT_SUCCESS);
+	}
 }
 
-int			p_is_outside(t_p3 p1, t_p3 p2, t_p3 p3, t_p3 ip)
+void		graphic_loop(t_minilibx mlx)
 {
-	t_p3	v1;
-	t_p3	v2;
-	t_p3	vp;
-
-	v1 = vsubstract(p2, p1);
-	v2 = vsubstract(p3, p1);
-	vp = vsubstract(ip, p1);
-	if (vcos(cross(v1, v2), cross(v1, vp)) < 0)
-		return (1);
-	return (0);
-}
-/*
-t_p3		reflect_ray(t_p3 ray, t_p3 normal)
-{
-    return (vsubstract(scal_x_vec(2 * dot(normal, ray), normal), ray));
-}
-*/
-int		color_product(int color, double coef)
-{
-	int mask = 255;
-	int r;
-	int	g;
-	int	b;
-
-	r = coef * ((color & (mask << 16)) >> 16);
-	g = coef * ((color & (mask << 8)) >> 8);
-	b = coef * (color & mask);
-
-	r = r > 255 ? 255 : r;
-	g = g > 255 ? 255 : g;
-	b = b > 255 ? 255 : b;
-
-	return ((r << 16) | (g << 8) | b);
-}
-
-int		add_colors(int color_a, int color_b)
-{
-	int mask = 255;
-	int	r;
-	int	g;
-	int b;
-
-	r = ((color_a & (mask << 16)) + (color_b & (mask << 16))) & (mask << 16);
-	g = ((color_a & (mask << 8)) + (color_b & (mask << 8))) & (mask << 8);
-	b = ((color_a & mask) + (color_b & mask)) & mask;
-
-	return (r | g | b);
+	mlx_put_image_to_window(mlx.mlx_ptr, mlx.win_ptr, mlx.cam->img_ptr, 0, 0);
+	mlx_hook(mlx.win_ptr, DESTROYNOTIFY, STRUCTURENOTIFYMASK, close_program, 0);
+	mlx_hook(mlx.win_ptr, KEYPRESS, KEYPRESSMASK, next_cam, &mlx);
+	mlx_loop(mlx.mlx_ptr);
 }

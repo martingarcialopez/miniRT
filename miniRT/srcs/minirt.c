@@ -10,9 +10,9 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "miniRT.h"
+#include "minirt.h"
 
-t_p3		set_camera(int n, int i, int j, t_minilibx mlx, int xres, int yres)
+t_p3		set_camera(int n, t_rss rss, t_minilibx mlx)
 {
 	double	img_asp_ratio;
 	double	correct_fov;
@@ -22,11 +22,13 @@ t_p3		set_camera(int n, int i, int j, t_minilibx mlx, int xres, int yres)
 
 	x_offset = ((n % 3) * 0.5);
 	y_offset = ((n / 3) * 0.5);
-	img_asp_ratio = (double)xres / (double)yres;
+	img_asp_ratio = (double)(rss.xres) / (double)(rss.yres);
 	correct_fov = tan((mlx.cam->fov * M_PI / 180) / 2);
-	p.x = ((2 * ((i + x_offset) / xres)) - 1) * img_asp_ratio * correct_fov;
-	p.y = (1 - (2 * ((j + y_offset) / yres))) * correct_fov;
-	p.z = -1;
+	p.x =
+	((2 * ((rss.i + x_offset) / rss.xres)) - 1) * img_asp_ratio * correct_fov;
+	p.y = (1 - (2 * ((rss.j + y_offset) / rss.yres))) * correct_fov;
+	p.x *= -1;
+	p.z = 1;
 	normalize(p);
 	return (p);
 }
@@ -42,364 +44,350 @@ t_p3		look_at(t_p3 d, t_p3 cam_nv)
 	tmp = vdefine(0, 1, 0);
 	z_axis = cam_nv;
 	if (cam_nv.y == 1 || cam_nv.y == -1)
-		x_axis = vdefine(1, 0, 0);
+		x_axis = cam_nv.y == 1 ? vdefine(1, 0, 0) : vdefine(-1, 0, 0);
 	else
 		x_axis = cross(tmp, z_axis);
 	y_axis = cross(z_axis, x_axis);
 	rotated.x = d.x * x_axis.x + d.y * x_axis.y + d.z * x_axis.z;
 	rotated.y = d.x * y_axis.x + d.y * y_axis.y + d.z * y_axis.z;
 	rotated.z = d.x * z_axis.x + d.y * z_axis.y + d.z * z_axis.z;
-	rotated.z *= -1;
 	return (rotated);
 }
 
-void	try_all_intersections(t_p3 o, t_p3 d, double min, t_figures *lst, t_figures *closest_figure, double
-		*closest_intersection, double (*fun_ptr[NUM_FIGS])(t_p3, t_p3, t_figures *))
+int			apply_t(int texture, t_inter inter)
 {
-	double	intersection_distance;
+	int		black;
+	int		white;
+	t_p3	coords;
+	t_p3	val;
+	int		party_mix;
 
-	while (lst)
-	{
-		intersection_distance = (fun_ptr[lst->flag])(o, d, lst);
-		if (intersection_distance > min && intersection_distance < *closest_intersection)
-		{
-			*closest_figure = *lst;
-			*closest_intersection = intersection_distance;
-		}
-		lst = lst->next;
-	}
+	texture += 1;
+	black = 0x000000;
+	white = 0xffffff;
+	coords.x = abs((int)floor(inter.p.x));
+	coords.y = abs((int)floor(inter.p.y));
+	coords.z = abs((int)floor(inter.p.z));
+	val.x = (int)coords.x % 2;
+	val.y = (int)coords.y % 2;
+	val.z = (int)coords.z % 2;
+	party_mix = ((int)val.x ^ (int)val.y) ^ (int)val.z;
+	return (party_mix ? black : white);
 }
 
-int		apply_texture(t_p3 coords)
+int			trace_ray(t_p3 o, t_p3 d, t_wrapper *w, int depth)
 {
-		int black = 0x000000;
-		int	white = 0xffffff;
-		int	x = abs((int)floor(coords.x));
-		int	y = abs((int)floor(coords.y));
-		int z = abs((int)floor(coords.z));
-		int	a;
-		int	b;
-		int	c;
-		int	party_mix;
-
-		a = x % 2;
-		b = y % 2;
-		c = z % 2;
-
-		party_mix = (a ^ b) ^ c;	
-
-		return (party_mix ? black : white);
-}
-
-int	trace_ray(t_p3 o, t_p3 d, double min, t_scene data, t_figures *lst, int depth)
-{
-	double		(*fun_ptr[NUM_FIGS])(t_p3, t_p3, t_figures *) = {
-				&sphere_intersection,
-				&plane_intersection,
-				&square_intersection,
-				&triangle_intersection,
-				&cylinder_intersection };
-	
-	t_figures	closest_figure;
+	t_v3		ray;
+	t_figures	cl_fig;
+	t_inter		inter;
 	double		closest_intersection;
-	t_p3		normal;
-	t_p3		intersection_point;
-	int			local_color;
-	t_p3		reflected_vec;
-	int			reflected_color;
 	double		r;
 
-	local_color = reflected_color = 0x000000;
-	data.background = 0x202020;
+	ray.o = o;
+	ray.d = d;
+	inter.color = 0x000000;
+	inter.ref_color = 0x000000;
+	w->data.bgr = 0x202020;
 	closest_intersection = INFINITY;
-	closest_figure.flag = -1;
-	try_all_intersections(o, d, min, lst, &closest_figure, &closest_intersection, fun_ptr);
-//	local_color = closest_figure.flag != -1 ? closest_figure.color : data.background;
-	intersection_point = vadd(o, scal_x_vec(closest_intersection, d));
-	local_color = closest_figure.flag != -1 ? closest_figure.texture == 1 ? apply_texture(intersection_point) : closest_figure.color : data.background;
-	calc_normal(intersection_point, d, &normal, closest_figure);
-	compute_light(o, &local_color, intersection_point, normal, data, lst, fun_ptr);
-
-	r = closest_figure.refl_idx;	
-	if (depth <= 0 || r <= 0)
-		return (local_color);
-
-	reflected_vec = reflect_ray(scal_x_vec(-1, d), normal);
-	reflected_color = trace_ray(intersection_point, reflected_vec, 0.001, data, lst, depth - 1);
-
-	return (add_colors(color_product(local_color, 1 - r), color_product(reflected_color, r)));
+	cl_fig.flag = -1;
+	try_all_intersections(ray, w->lst, &cl_fig, &closest_intersection);
+	inter.p = vadd(o, scal_x_vec(closest_intersection, d));
+	calc_normal(inter.p, d, &(inter.normal), cl_fig);
+	inter.color = cl_fig.flag != -1 ? cl_fig.color : w->data.bgr;
+	inter.color = cl_fig.texture ? apply_t(cl_fig.texture, inter) : inter.color;
+	compute_light(ray, &inter, w->data, w->lst);
+	r = cl_fig.flag != -1 ? cl_fig.refl_idx : 0;
+	if (r <= 0 || depth <= 0)
+		return (inter.color);
+	inter.ref_vec = reflect_ray(scal_x_vec(-1, d), inter.normal);
+	inter.ref_color = trace_ray(inter.p, inter.ref_vec, w, depth - 1);
+	return (cadd(cproduct(inter.color, 1 - r), cproduct(inter.ref_color, r)));
 }
 
-int		calc_ray(int n, int i, int j, int xres, int yres, t_minilibx mlx, t_scene data, t_figures *lst)
+int			calc_ray(int n, t_rss rss, t_wrapper *w)
 {
 	t_p3	d;
 	int		color;
 
-	d = set_camera(n, i, j, mlx, xres, yres);
-	d = look_at(d, mlx.cam->nv);
-	color = trace_ray(mlx.cam->o, d, 0.0, data, lst, 2);	
+	d = set_camera(n, rss, w->mlx);
+	d = look_at(d, w->mlx.cam->nv);
+	color = trace_ray(w->mlx.cam->o, d, w, REFLECTION_LIMIT);
 	return (color);
 }
-/*
-int		calc_supersampled_ray(int diff_ray, int i, int j, t_minilibx mlx, t_scene data, t_figures *lst)
+
+int			average_supersampled_color(int *color)
 {
-	t_p3	d;
-	int		color;
+	int		ss_color[3];
+	int		mask;
+	int		n;
 
-
-
-
-	d = set_camera(n, i, j, mlx, data.xres, data.yres);
-	d = look_at(d, mlx.cam->nv);
-	color = trace_ray(mlx.cam->o, d, 0.0, data, lst, 3);	
-	return (color);
-}
-*/
-
-int		average(int color1, int color2)
-{
-	int		average[3] = {0, 0, 0};
-	int		mask = 255;
-	int		color[2];
-	int		i;
-
-	color[0] = color1;
-	color[1] = color2;
-	i = 0;
-	while (i < 2)
+	ft_memset(ss_color, 0, sizeof(int) * 3);
+	mask = 255;
+	n = 0;
+	while (n < 4)
 	{
-		average[0] += (color[i] & (mask << 16)) >> 16;
-		average[1] += (color[i] & (mask << 8)) >> 8;
-		average[2] += color[i] & mask;
-		i++;
+		ss_color[0] += (color[n] & (mask << 16)) >> 16;
+		ss_color[1] += (color[n] & (mask << 8)) >> 8;
+		ss_color[2] += color[n] & mask;
+		n++;
 	}
-	average[0] = average[0] / 2;
-	average[1] = average[1] / 2;
-	average[2] = average[2] / 2;
-	return ((average[0] << 16) | (average[1] << 8) | average[2]);	
+	ss_color[0] = ss_color[0] / 4;
+	ss_color[1] = ss_color[1] / 4;
+	ss_color[2] = ss_color[2] / 4;
+	return ((ss_color[0] << 16) | (ss_color[1] << 8) | ss_color[2]);
 }
 
-int	color_difference(int color1, int color2)
+int			supersample_first_corner(int *color, int center,
+												t_rss rss, t_wrapper *w)
 {
-	int		mask = 255;
-	int		r1;
-	int		g1;
-	int		b1;
-	int		r2;
-	int		g2;
-	int		b2;
-	int		distance_exp2;
+	t_rss	tmp;
+	int		*subsquare;
+	int		col;
 
-	r1 = (color1 & (mask << 16)) >> 16;
-	g1 = (color1 & (mask << 8)) >> 8;
-	b1 = color1 & mask;
-
-	r2 = (color2 & (mask << 16)) >> 16;
-	g2 = (color2 & (mask << 8)) >> 8;
-	b2 = color2 & mask;
-
-	//printf("r1, g1 and b1 are %d, %d, %d ---- r2, g2 and b2 are %d, %d, %d\n", r1, g1, b1, r2, g2, b2);
-
-	distance_exp2 = pow((r2 - r1), 2) + pow((g2 - g1), 2) + pow((b2 - b1), 2);
-	return (distance_exp2 > 1000);
+	subsquare = (int *)ec_malloc(sizeof(int) * 4);
+	subsquare[0] = color[0];
+	subsquare[1] = calc_ray(1, rss, w);
+	subsquare[2] = calc_ray(3, rss, w);
+	subsquare[3] = center;
+	tmp.limit = rss.limit - 1;
+	tmp.i = rss.i * 2 - 1;
+	tmp.j = rss.j * 2 - 1;
+	tmp.xres = rss.xres * 2;
+	tmp.yres = rss.yres * 2;
+	col = supersample(subsquare, tmp, w);
+	return (col);
 }
 
-int		supersample(int limit, int i, int j, int xres, int yres, t_minilibx mlx, t_scene data, t_figures
-		*lst, int color[4])
+int			supersample_second_corner(int *color, int center,
+												t_rss rss, t_wrapper *w)
+{
+	t_rss	tmp;
+	int		*subsquare;
+	int		col;
+
+	subsquare = (int *)ec_malloc(sizeof(int) * 4);
+	subsquare[0] = calc_ray(3, rss, w);
+	subsquare[1] = color[1];
+	subsquare[2] = center;
+	subsquare[3] = calc_ray(5, rss, w);
+	tmp.limit = rss.limit - 1;
+	tmp.i = rss.i * 2;
+	tmp.j = rss.j * 2 - 1;
+	tmp.xres = rss.xres * 2;
+	tmp.yres = rss.yres * 2;
+	col = supersample(subsquare, tmp, w);
+	return (col);
+}
+
+int			supersample_third_corner(int *color, int center,
+												t_rss rss, t_wrapper *w)
+{
+	t_rss	tmp;
+	int		*subsquare;
+	int		col;
+
+	subsquare = (int *)ec_malloc(sizeof(int) * 4);
+	subsquare[0] = calc_ray(3, rss, w);
+	subsquare[1] = center;
+	subsquare[2] = color[2];
+	subsquare[3] = calc_ray(7, rss, w);
+	tmp.limit = rss.limit - 1;
+	tmp.i = rss.i * 2 - 1;
+	tmp.j = rss.j * 2;
+	tmp.xres = rss.xres * 2;
+	tmp.yres = rss.yres * 2;
+	col = supersample(subsquare, tmp, w);
+	return (col);
+}
+
+int			supersample_fourth_corner(int *color, int center,
+												t_rss rss, t_wrapper *w)
+{
+	t_rss	tmp;
+	int		*subsquare;
+	int		col;
+
+	subsquare = (int *)ec_malloc(sizeof(int) * 4);
+	subsquare[0] = center;
+	subsquare[1] = calc_ray(5, rss, w);
+	subsquare[2] = calc_ray(7, rss, w);
+	subsquare[3] = color[3];
+	tmp.limit = rss.limit - 1;
+	tmp.i = rss.i * 2;
+	tmp.j = rss.j * 2;
+	tmp.xres = rss.xres * 2;
+	tmp.yres = rss.yres * 2;
+	col = supersample(subsquare, tmp, w);
+	return (col);
+}
+
+int			supersample(int *color, t_rss rss, t_wrapper *w)
 {
 	int		center;
-	int		subsquare[4];
-	int		ss_color[3] = { 0, 0, 0 };
-	int		mask = 255;
 	int		n;
 
-	center = calc_ray(4, i, j, xres, yres, mlx, data, lst);
-	if (!color_difference(color[0], center) || limit == 0)
-		color[0] = average(color[0], center);
-	else
-	{
-		subsquare[0] = color[0];
-		subsquare[1] = calc_ray(1, i, j, xres, yres, mlx, data, lst);
-		subsquare[2] = calc_ray(3, i, j, xres, yres, mlx, data, lst);
-		subsquare[3] = center;
-		color[0] = supersample(limit - 1, (i * 2) - 1, (j * 2) - 1, xres * 2, yres * 2, mlx, data, lst, subsquare);
-	}
-	if (!color_difference(color[1], center) || limit == 0)
-		color[1] = average(color[1], center);
-	else
-	{
-		subsquare[0] = calc_ray(3, i, j, xres, yres, mlx, data, lst);
-		subsquare[1] = color[1];
-		subsquare[2] = center;
-		subsquare[3] = calc_ray(5, i, j, xres, yres, mlx, data, lst);
-		color[1] = supersample(limit - 1, i * 2, (j * 2) - 1, xres * 2, yres * 2, mlx, data, lst, subsquare);
-	}
-	if (!color_difference(color[2], center) || limit == 0)
-		color[2] = average(color[2], center);
-	else
-	{
-		subsquare[0] = calc_ray(3, i, j, xres, yres, mlx, data, lst);
-		subsquare[1] = center;
-		subsquare[2] = color[2];
-		subsquare[3] = calc_ray(7, i, j, xres, yres, mlx, data, lst);
-		color[2] = supersample(limit - 1, (i * 2) - 1, j * 2, xres * 2, yres * 2, mlx, data, lst, subsquare);
-	}
-
-	if (!color_difference(color[3], center) || limit == 0)
-		color[3] = average(color[3], center);
-	else
-	{
-		subsquare[0] = center;
-		subsquare[1] = calc_ray(5, i, j, xres, yres, mlx, data, lst);
-		subsquare[2] = calc_ray(7, i, j, xres, yres, mlx, data, lst);
-		subsquare[3] = color[3];
-		color[3] = supersample(limit - 1, i * 2, j * 2, xres * 2, yres * 2, mlx, data, lst, subsquare);
-	}
-
+	center = calc_ray(4, rss, w);
 	n = 0;
 	while (n < 4)
 	{
-		ss_color[0] += (color[n] & (mask << 16)) >> 16;
-		ss_color[1] += (color[n] & (mask << 8)) >> 8;
-		ss_color[2]	+= color[n] & mask;
+		if (!color_difference(color[n], center) || rss.limit == 0)
+			color[n] = average(color[n], center);
+		else
+		{
+			if (n == 0)
+				color[0] = supersample_first_corner(color, center, rss, w);
+			else if (n == 1)
+				color[1] = supersample_second_corner(color, center, rss, w);
+			else if (n == 2)
+				color[2] = supersample_third_corner(color, center, rss, w);
+			else
+				color[3] = supersample_fourth_corner(color, center, rss, w);
+		}
 		n++;
 	}
-	ss_color[0] = ss_color[0] / 4;
-	ss_color[1] = ss_color[1] / 4;
-	ss_color[2] = ss_color[2] / 4;
-	return ((ss_color[0] << 16) | (ss_color[1] << 8) | ss_color[2]);	
+	return (average_supersampled_color(color));
 }
 
-int		calc_supersampled_color(int i, int j, int *edge_color, t_minilibx mlx, t_scene data,
-		t_figures *lst, int *last, int *last_row1, int tid)
+int			*sample_first_column(int *edge_color, int last[2],
+												t_rss rss, t_wrapper *w)
 {
-	t_p3	d;
-	int		color[4];
-	int		color2[4];
-	int		ss_color[3] = {0, 0, 0};
-	int		mask = 255;
-	int		tl0 = data.yres / NUM_THREADS * tid; // thread line 0
+	int		*color;
+
+	color = (int *)ec_malloc(sizeof(int) * 4);
+	if (rss.j == w->data.yres / NUM_THREADS * w->tid)
+	{
+		color[0] = calc_ray(0, rss, w);
+		color[1] = calc_ray(2, rss, w);
+		color[2] = calc_ray(6, rss, w);
+		color[3] = calc_ray(8, rss, w);
+		last[0] = color[3];
+		last[1] = color[1];
+		edge_color[0] = color[2];
+	}
+	else
+	{
+		color[0] = edge_color[0];
+		color[1] = edge_color[1];
+		color[2] = calc_ray(6, rss, w);
+		color[3] = calc_ray(8, rss, w);
+		last[0] = color[3];
+		edge_color[0] = color[2];
+	}
+	return (color);
+}
+
+int			*sample_last_column(int *edge_color, int last[2],
+												t_rss rss, t_wrapper *w)
+{
+	int		*color;
+
+	color = (int *)ec_malloc(sizeof(int) * 4);
+	if (rss.j == w->data.yres / NUM_THREADS * w->tid)
+	{
+		color[0] = last[1];
+		color[1] = calc_ray(2, rss, w);
+		color[2] = last[0];
+		color[3] = calc_ray(8, rss, w);
+		edge_color[rss.i] = color[2];
+		edge_color[rss.i + 1] = color[3];
+	}
+	else
+	{
+		color[0] = edge_color[rss.i];
+		color[1] = edge_color[rss.i + 1];
+		color[2] = last[0];
+		color[3] = calc_ray(3, rss, w);
+		edge_color[rss.i] = color[2];
+		edge_color[rss.i + 1] = color[3];
+	}
+	return (color);
+}
+
+int			*sample_centered_pixel(int *edge_color, int last[2],
+												t_rss rss, t_wrapper *w)
+{
+	int		*color;
+
+	color = (int *)ec_malloc(sizeof(int) * 4);
+	if (rss.j == w->data.yres / NUM_THREADS * w->tid)
+	{
+		color[0] = last[1];
+		color[1] = calc_ray(2, rss, w);
+		color[2] = last[0];
+		color[3] = calc_ray(8, rss, w);
+		last[0] = color[3];
+		last[1] = color[1];
+		edge_color[rss.i] = color[2];
+	}
+	else
+	{
+		color[0] = edge_color[rss.i];
+		color[1] = edge_color[rss.i + 1];
+		color[2] = last[0];
+		color[3] = calc_ray(4, rss, w);
+		last[0] = color[3];
+		edge_color[rss.i] = color[2];
+	}
+	return (color);
+}
+
+int			*sample_pixel(int *edge_color, int last[2],
+											t_rss rss, t_wrapper *w)
+{
+	int		*color;
+
+	if (rss.i == 0)
+		color = sample_first_column(edge_color, last, rss, w);
+	else if (rss.i == w->data.xres - 1)
+		color = sample_last_column(edge_color, last, rss, w);
+	else
+		color = sample_centered_pixel(edge_color, last, rss, w);
+	return (color);
+}
+
+int			calc_pixel_color(int *edge_color, int last[2], t_wrapper *w)
+{
+	t_rss	rss;
+	int		*color;
+
+	rss.limit = 3;
+	rss.xres = w->data.xres;
+	rss.yres = w->data.yres;
+	rss.i = w->i;
+	rss.j = w->j;
+	color = sample_pixel(edge_color, last, rss, w);
+	if (color_difference(color[0], color[3])
+		|| color_difference(color[1], color[2]))
+		return (supersample(color, rss, w));
+	return (average_supersampled_color(color));
+}
+
+void		render_scene(t_wrapper *w)
+{
+	int		edge_color[w->data.xres + 2];
+	int		last[3];
+	int		color;
 	int		n;
-	n = 0;
-	/*
-	while (n < 4)
-	{
-		d = set_camera(n, i, j, mlx, data.xres, data.yres);
-		d = look_at(d, mlx.cam->nv);
-		color2[n] = trace_ray(mlx.cam->o, d, 0.0, data, lst, 3);
-		n++;
-	}
-	*/
-	if (j == tl0)
-	{
-		if (i == 0)
-		{
-			color[0] = calc_ray(0, i, j, data.xres, data.yres, mlx, data, lst);
-			color[1] = *last_row1 = calc_ray(2, i, j, data.xres, data.yres, mlx, data, lst);
-			color[2] = edge_color[0] = calc_ray(6, i, j, data.xres, data.yres, mlx, data, lst);
-			color[3] = *last = calc_ray(8, i, j, data.xres, data.yres, mlx, data, lst);
-		}
-		else if (i == data.xres - 1)
-		{
-			color[0] = *last_row1;
-			color[1] = calc_ray(2, i, j, data.xres, data.yres, mlx, data, lst);
-			color[2] = edge_color[i] = *last;
-			color[3] = edge_color[i + 1] = calc_ray(8, i, j, data.xres, data.yres, mlx, data, lst);
-		}
-		else
-		{
-			color[0] = *last_row1;
-			color[1] = *last_row1 = calc_ray(2, i, j, data.xres, data.yres, mlx, data, lst);
-			color[2] = edge_color[i] = *last;
-			color[3] = *last = calc_ray(8, i, j, data.xres, data.yres, mlx, data, lst);
-		}
-	}
-	else
-	{
-		if (i == 0)
-		{
-			color[0] = edge_color[0];
-			color[1] = edge_color[1];
-			color[2] = edge_color[0] = calc_ray(6, i, j, data.xres, data.yres, mlx, data, lst);
-			color[3] = *last = calc_ray(8, i, j, data.xres, data.yres, mlx, data, lst);
-		}
-		else if (i == data.xres - 1)
-		{
-			color[0] = edge_color[i];
-			color[1] = edge_color[i + 1];
-			color[2] = edge_color[i] = *last;
-			color[3] = edge_color[i + 1] = calc_ray(3, i, j, data.xres, data.yres, mlx, data, lst);
-		}
-		else
-		{
-			color[0] = edge_color[i];
-			color[1] = edge_color[i + 1];
-			color[2] = edge_color[i] = *last;
-			color[3] = *last = calc_ray(4, i, j, data.xres, data.yres, mlx, data, lst);
-		}
-	}
 
-	if (color_difference(color[0], color[3]) || color_difference(color[1], color[2])) 
-		return (supersample(2, i, j, data.xres, data.yres, mlx, data, lst, color));
-
-	n = 0;
-	while (n < 4)
+	n = w->data.yres / NUM_THREADS;
+	w->j = n * w->tid;
+	while (w->j < (n * (w->tid + 1)))
 	{
-		ss_color[0] += (color[n] & (mask << 16)) >> 16;
-		ss_color[1] += (color[n] & (mask << 8)) >> 8;
-		ss_color[2]	+= color[n] & mask;
-		n++;
-	}
-	ss_color[0] = ss_color[0] / 4;
-	ss_color[1] = ss_color[1] / 4;
-	ss_color[2] = ss_color[2] / 4;
-	return ((ss_color[0] << 16) | (ss_color[1] << 8) | ss_color[2]);	
-}
-
-void	render_scene(t_minilibx mlx, t_scene data, t_figures *lst, int tid)
-{
-	//t_p3	d;
-	int		n = data.yres / NUM_THREADS;
-	int		i;
-	int		j;
-	int		supersampled_color;
-	int		edge_color[data.xres + 2];
-	int		last;
-	int		last_row1;
-
-	j = n * tid;
-	while (j < (n * (tid + 1))/*j < data.yres*/)
-	{
-		//i = tid;
-		i = 0;
-		while (i < data.xres)
+		w->i = 0;
+		while (w->i < w->data.xres)
 		{
-			supersampled_color = calc_supersampled_color(i, j, edge_color, mlx, data, lst, &last,
-					&last_row1, tid);
-			mlx.cam->px_img[j * data.xres + i] = supersampled_color;
-			//i += NUM_THREADS;
-			i++;
+			color = calc_pixel_color(edge_color, last, w);
+			w->mlx.cam->px_img[w->j * w->data.xres + w->i] = color;
+			w->i++;
 		}
-		j++;
+		if (w->tid == 0)
+			ft_printf("\rRendering scene... (cam %d/%d) [%d%%]",
+			w->mlx.cam->idx, w->data.cam_nb, 100 * w->j / (n * (w->tid + 1)));
+		w->j++;
 	}
-}
-
-void		init_mlx(t_minilibx *mlx, t_scene data)
-{
-	t_camera	*cam_begin;
-
-	mlx->mlx_ptr = mlx_init();
-	mlx->win_ptr = mlx_new_window(mlx->mlx_ptr, data.xres, data.yres, "basic miniRT");
-	cam_begin = mlx->cam;
-	mlx->begin = mlx->cam;
-	while (mlx->cam)
-	{
-		mlx->cam->img_ptr = mlx_new_image(mlx->mlx_ptr, data.xres, data.yres);
-		mlx->cam->px_img = (int *)mlx_get_data_addr(mlx->cam->img_ptr,
-				&mlx->cam->bits_per_pixel, &mlx->cam->size_line, &mlx->cam->endian);
-		mlx->cam = mlx->cam->next;
-	}
-	mlx->cam = cam_begin;
+	if (w->tid == 0)
+		ft_printf("\rRendering scene... (cam %d/%d) [100%%]\n",
+											w->mlx.cam->idx, w->data.cam_nb);
 }
 
 void		*render_thread(void *ptr)
@@ -409,13 +397,14 @@ void		*render_thread(void *ptr)
 	w = (t_wrapper *)ptr;
 	while (w->mlx.cam)
 	{
-		render_scene(w->mlx, w->data, w->lst, w->tid);
+		render_scene(w);
 		w->mlx.cam = w->mlx.cam->next;
 	}
 	return (NULL);
 }
 
-void			wrapp_data(t_minilibx mlx, t_scene data, t_figures *lst, t_wrapper *wrapper)
+void		wrapp_data(
+			t_minilibx mlx, t_scene data, t_figures *lst, t_wrapper *wrapper)
 {
 	int	i;
 
@@ -429,128 +418,11 @@ void			wrapp_data(t_minilibx mlx, t_scene data, t_figures *lst, t_wrapper *wrapp
 		i++;
 	}
 }
-int			create_file(char *name)
-{
-	char	*bmpname;
-	int		path;
-	int		fd;
-	int		i;
-	int		j;
 
-	path = 0;
-	bmpname = (char *)ec_malloc(ft_strlen(name) + 1);
-	i = 0;
-	while (name[i])
-		if (name[i++] == '/')
-			path++;
-	i = 0;
-	while (path && name[i])
-		if (name[i++] == '/')
-			path--;
-	j = 0;
-	while (name[i] && name[i] != '.')
-		bmpname[j++] = name[i++];
-	bmpname[j] = '\0';
-	ft_strcat(bmpname, ".bmp");
-	if(!((fd = open(bmpname, O_WRONLY | O_CREAT | O_TRUNC, S_IRUSR | S_IWUSR)) > 0))
-		fatal("in do_the_bmp_thing() while creating file");
-	
-	return (fd);
-}
-
-void		create_header(t_scene data, t_bmphead *header, t_dibhead *dib)
-{
-	header->type[0] = 0x42;
-	header->type[1] = 0x4D;
-	header->size = (data.xres * data.yres * 4) + 54;
-	header->reserved = 0x00000000;
-	header->offset = 0x36;
-
-	dib->size = 40;
-	dib->width = data.xres;
-	dib->height = -data.yres;
-	dib->colplanes = 1;
-	dib->bpp = 32;
-	dib->compression = 0;
-	dib->img_size = (data.xres * data.yres * 4);
-	dib->x_ppm = 2835;
-	dib->y_ppm = 2835;
-	dib->color_number = 0;
-	dib->important_color = 0;
-}
-
-void		write_header(int fd, t_bmphead header, t_dibhead dib)
-{
-	write(fd, &header.type, 2);
-	write(fd, &header.size, 4);
-	write(fd, &header.reserved, 4);
-	write(fd, &header.offset, 4);
-
-	write(fd, &dib.size, 4);
-	write(fd, &dib.width, 4);
-	write(fd, &dib.height, 4);
-	write(fd, &dib.colplanes, 2);
-	write(fd, &dib.bpp, 2);
-	write(fd, &dib.compression, 4);
-	write(fd, &dib.img_size, 4);
-	write(fd, &dib.x_ppm, 4);
-	write(fd, &dib.y_ppm, 4);
-	write(fd, &dib.color_number, 4);
-	write(fd, &dib.important_color, 4);
-}
-void		write_file(int fd, t_scene data, t_minilibx mlx)
-{
-	char	pixel_array[mlx.cam->size_line * data.yres];
-	int		image_size;
-	int		i;
-	int		j;
-
-	image_size = data.xres * data.yres;
-	i = 0;
-	j = 0;
-	while (i < image_size)
-	{
-		pixel_array[j++] = mlx.cam->px_img[i] & 255; // B
-		pixel_array[j++] = (mlx.cam->px_img[i] & 255 << 8) >> 8; // G
-		pixel_array[j++] = (mlx.cam->px_img[i] & 255 << 16) >> 16; // R
-		pixel_array[j++] = 0;
-		i++;
-	}
-	write(fd, pixel_array, mlx.cam->size_line * data.yres);
-}
-
-void		do_the_bmp_thing(t_minilibx mlx, t_scene data, char *name)
-{
-	t_bmphead	header;
-	t_dibhead	dib;
-	int			fd;
-	int			i;
-	int			j;
-
-	fd = create_file(name);
-	create_header(data, &header, &dib);
-	write_header(fd, header, dib);
-	write_file(fd, data, mlx);	
-	close(fd);
-	//ahora solo tienes que llenar el puto bmp
-}
-
-int			main(int ac, char **av)
+void		multithreaded_render(t_wrapper wrapper[NUM_THREADS])
 {
 	pthread_t	threads[NUM_THREADS];
-	t_wrapper	wrapper[NUM_THREADS];
-	t_minilibx	mlx;
-	t_scene		data;
-	t_figures	*lst;
 	int			i;
-
-
-	if (ac < 2)
-		usage(av[0]);
-	
-	parse_scene(&mlx, &data, &lst, av);
-	init_mlx(&mlx, data);
-	wrapp_data(mlx, data, lst, wrapper);
 
 	i = 0;
 	while (i < NUM_THREADS)
@@ -560,16 +432,31 @@ int			main(int ac, char **av)
 	}
 	i = 0;
 	while (i < NUM_THREADS)
-		pthread_join(threads[i++], NULL);
-	mlx.cam = mlx.begin;
-	if (ac == 3)
 	{
-		do_the_bmp_thing(mlx, data, av[1]);
-		exit(0);
+		if (i > 0)
+			ft_printf("waiting thread %d to finish...\n", i + 1);
+		pthread_join(threads[i++], NULL);
 	}
-	mlx_put_image_to_window (mlx.mlx_ptr, mlx.win_ptr, mlx.cam->img_ptr, 0, 0);
-	mlx_hook(mlx.win_ptr, 17, 1L << 17, ft_close, (void *)0);
-	mlx_hook(mlx.win_ptr, 2, 0, next_cam, &mlx);
-	mlx_loop(mlx.mlx_ptr);
+}
+
+int			main(int ac, char **av)
+{
+	t_wrapper	wrapper[NUM_THREADS];
+	t_minilibx	mlx;
+	t_scene		data;
+	t_figures	*lst;
+
+	if (ac < 2 || ac > 3)
+		usage(av[0]);
+	if (ac == 3 && ft_strcmp(av[2], "--save"))
+		scene_error("invalid argument\n");
+	parse_scene(&mlx, &data, &lst, av);
+	init_mlx(&mlx, &data);
+	wrapp_data(mlx, data, lst, wrapper);
+	multithreaded_render(wrapper);
+	if (ac == 3)
+		do_the_bmp_thing(mlx, data, av[1]);
+	success_message(ac);
+	graphic_loop(mlx);
 	return (0);
 }
