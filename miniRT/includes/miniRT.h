@@ -46,7 +46,6 @@
 
 #define EPSILON 0.00001
 #define FILE_CREATE_FLAGS O_WRONLY | O_CREAT | O_TRUNC, S_IRUSR | S_IWUSR
-#define NUM_FIGS 5
 
 typedef struct		s_v3
 {
@@ -257,10 +256,14 @@ int				solve_cylinder(double x[2], t_p3 o, t_p3 d, t_figures *lst);
 t_p3			calc_cy_normal(double x2[2], t_p3 o, t_p3 d, t_figures *lst);
 
 /*
-**				Ray tracing help functions
+**				Ray tracing
 */
 
-int				supersample(int *color, t_rss rss, t_wrapper *w);
+void			render_scene(t_wrapper *w);
+
+int				trace_ray(t_p3 o, t_p3 d, t_wrapper *w, int depth);
+
+int				calc_ray(int n, t_rss rss, t_wrapper *w);
 
 void			calc_normal(t_p3 p, t_p3 d, t_p3 *normal, t_figures lst);
 
@@ -268,7 +271,22 @@ int				is_lit(t_p3 O, t_p3 d, t_figures *lst);
 
 void			compute_light(t_v3 ray, t_inter *inter, t_scene data, t_figures *lst);
 
-int 			color_x_light(int color, double rgb[3]);
+/*
+**				Super Sampling
+*/
+
+int				*sample_pixel(int *edge_color, int last[2], t_rss rss, t_wrapper *w);
+
+int				supersample(int *color, t_rss rss, t_wrapper *w);
+
+
+/*
+**				Multithreaded rendering
+*/
+
+void			wrapp_data(t_minilibx mlx, t_scene data, t_figures *lst, t_wrapper *wrapper);
+
+void			multithreaded_render(t_wrapper wrapper[NUM_THREADS]);
 
 /*
 **				Error handling functions and success message
@@ -304,17 +322,27 @@ void			do_the_bmp_thing(t_minilibx mlx, t_scene data, char *name);
 
 
 /*
-**				Utils
+**				Color Operations
 */
-
-t_p3			reflect_ray(t_p3 ray, t_p3 normal);
 
 int				cproduct(int color, double coef);
 
 int				cadd(int color_a, int color_b);
 
+int				color_difference(int color1, int color2);
+
+int 			color_x_light(int color, double rgb[3]);
+
 int				average(int color1, int color2);
 
-int				color_difference(int color1, int color2);
+int				average_supersampled_color(int *color);
+
+/*
+**				Utils
+*/
+
+t_p3			reflect_ray(t_p3 ray, t_p3 normal);
+
+int				apply_t(int texture, t_inter inter);
 
 #endif

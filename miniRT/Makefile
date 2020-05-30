@@ -10,15 +10,21 @@ FILES	=	minirt.c \
 			parsing.c \
 			parse_info.c \
 			parse_elements.c \
+			multithreading.c \
+			camera.c \
 			intersections.c \
 			concerning_light.c \
+			sample_pixel.c \
+			supersampling.c \
 			bmp_exporter.c \
+			color_operations.c \
+			procedural_textures.c \
 			error_handling.c \
 			parsing_utils.c \
 			parsing_utils2.c \
 			utils.c \
 			utils2.c \
-			utils3.c
+			utils3.c \
 
 SRCS	= $(addprefix $(SRCDIR), $(FILES))
 
