@@ -6,7 +6,7 @@
 /*   By: mgarcia- <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/26 14:04:55 by mgarcia-          #+#    #+#             */
-/*   Updated: 2019/12/02 20:49:33 by mgarcia-         ###   ########.fr       */
+/*   Updated: 2020/05/30 19:18:21 by mgarcia-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,9 +59,6 @@ static void			format_frac(t_float fl, char *buf, t_flags *f)
 
 static void			print_float(t_float fl, char *buf, t_flags *f)
 {
-	int i;
-
-	i = 0;
 	if (f->width && (fl.neg || f->flags & (FLAG_PLUS | FLAG_SPACE)))
 		f->width--;
 	if (!(f->flags & FLAG_LEFT))

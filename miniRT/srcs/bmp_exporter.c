@@ -6,7 +6,7 @@
 /*   By: mgarcia- <mgarcia-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/05/15 13:06:26 by mgarcia-          #+#    #+#             */
-/*   Updated: 2020/05/15 13:06:30 by mgarcia-         ###   ########.fr       */
+/*   Updated: 2020/05/30 19:16:38 by mgarcia-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,7 +36,7 @@ int			create_file(char *name)
 		bmpname[j++] = name[i++];
 	bmpname[j] = '\0';
 	ft_strcat(bmpname, ".bmp");
-	if (!((fd = open(bmpname, FILE_CREATE_FLAGS)) > 0))
+	if (!((fd = open(bmpname, CREATE_FLAGS)) > 0))
 		fatal("in do_the_bmp_thing() while creating file");
 	return (fd);
 }

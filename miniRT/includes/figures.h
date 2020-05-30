@@ -6,7 +6,7 @@
 /*   By: mgarcia- <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/01/21 10:48:18 by mgarcia-          #+#    #+#             */
-/*   Updated: 2020/03/10 14:56:01 by mgarcia-         ###   ########.fr       */
+/*   Updated: 2020/05/30 19:15:50 by mgarcia-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,7 +50,7 @@ typedef struct	s_triangle
 	t_p3	p3;
 }				t_triangle;
 
-union			figures
+union			u_figures
 {
 	t_sphere	sp;
 	t_plane		pl;
