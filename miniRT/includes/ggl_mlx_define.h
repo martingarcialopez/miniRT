@@ -42,8 +42,8 @@
 ** # define OWNERGRABBUTTONMASK (1L<<24)
 */
 
-# define KEYPRESSMASK (1L<<0)
-# define STRUCTURENOTIFYMASK (1L << 17)
+# define KEYPRESSMASK 1
+# define STRUCTURENOTIFYMASK 131072
 
 # define KEYPRESS 2
 # define KEYRELEASE 3
@@ -214,7 +214,7 @@
 # ifdef MACOS
 #  define ESC_KEY 53
 # else
-# define ESC_KEY 65307
+#  define ESC_KEY 65307
 # endif
 # define TAB_KEY 48
 # define CL_KEY 272

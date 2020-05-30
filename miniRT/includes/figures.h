@@ -10,10 +10,10 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef _FIGURES_H_
-# define _FIGURES_H_
+#ifndef FIGURES_H
+# define FIGURES_H
 
-#include "minirt.h"
+# include "minirt.h"
 
 typedef struct	s_sphere
 {
@@ -50,7 +50,7 @@ typedef struct	s_triangle
 	t_p3	p3;
 }				t_triangle;
 
-union 		figures
+union			figures
 {
 	t_sphere	sp;
 	t_plane		pl;
@@ -58,15 +58,5 @@ union 		figures
 	t_cylinder	cy;
 	t_triangle	tr;
 };
-
-/*
-typedef struct	s_lst
-{
-	int				color;
-	int				flag;
-	union figures	fig;
-	struct s_lst	*next;
-}				t_lst;
-*/
 
 #endif
