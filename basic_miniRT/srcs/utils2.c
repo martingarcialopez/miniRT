@@ -10,7 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "miniRT.h"
+#include "minirt.h"
 
 void		try_all_intersections(t_v3 ray, t_figures *lst,
 					t_figures *closest_figure, double *closest_intersection)

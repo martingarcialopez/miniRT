@@ -10,7 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "miniRT.h"
+#include "minirt.h"
 
 t_p3	set_camera(int i, int j, t_minilibx mlx, t_scene data)
 {

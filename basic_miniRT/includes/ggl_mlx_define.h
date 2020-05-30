@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ggl_mlx_define.h                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: gozsertt <gozsertt@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mgarcia- <mgarcia-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2020/01/12 13:39:20 by ldutriez          #+#    #+#             */
-/*   Updated: 2020/04/03 19:56:51 by gozsertt         ###   ########.fr       */
+/*   Created: 2020/05/30 19:08:40 by mgarcia-          #+#    #+#             */
+/*   Updated: 2020/05/30 19:08:45 by mgarcia-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,8 +42,8 @@
 ** # define OWNERGRABBUTTONMASK (1L<<24)
 */
 
-# define KEYPRESSMASK (1L<<0)
-# define STRUCTURENOTIFYMASK (1L << 17)
+# define KEYPRESSMASK 1
+# define STRUCTURENOTIFYMASK 131072
 
 # define KEYPRESS 2
 # define KEYRELEASE 3
@@ -214,7 +214,7 @@
 # ifdef MACOS
 #  define ESC_KEY 53
 # else
-# define ESC_KEY 65307
+#  define ESC_KEY 65307
 # endif
 # define TAB_KEY 48
 # define CL_KEY 272

@@ -10,7 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "miniRT.h"
+#include "minirt.h"
 
 double		plane_intersection(t_p3 o, t_p3 d, t_figures *lst)
 {

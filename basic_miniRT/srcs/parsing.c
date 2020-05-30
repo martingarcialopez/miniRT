@@ -10,7 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "miniRT.h"
+#include "minirt.h"
 
 void	parse(t_minilibx *mlx, t_scene *data, t_figures **lst, char **strptr)
 {

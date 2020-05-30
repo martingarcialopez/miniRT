@@ -1,7 +1,7 @@
 /*			HEADEERRR BTCH							*/
 
-#ifndef LIBVCT
-# define LIBVCT
+#ifndef LIBVCT_H
+# define LIBVCT_H
 
 # include <math.h>
 
@@ -9,7 +9,7 @@ typedef struct	s_p3
 {
 	double		x;
 	double		y;
-	double 		z;
+	double		z;
 }				t_p3;
 
 t_p3			vdefine(double x, double y, double z);
