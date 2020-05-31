@@ -32,7 +32,7 @@ void		parse_sphere(t_figures **elem, char **str)
 	lst->refr_idx = stof(str);
 	in_range(lst->refr_idx, 0, INFINITY, "sphere");
 	lst->texture = stoi(str);
-	in_range(lst->texture, 0, 2, "sphere");
+	in_range(lst->texture, 0, 5, "sphere");
 	lst->color = parse_color(str);
 }
 
@@ -55,7 +55,7 @@ void		parse_plane(t_figures **elem, char **str)
 	lst->refr_idx = stof(str);
 	in_range(lst->refr_idx, 0, INFINITY, "plane");
 	lst->texture = stoi(str);
-	in_range(lst->texture, 0, 2, "plane");
+	in_range(lst->texture, 0, 5, "plane");
 	lst->color = parse_color(str);
 }
 
@@ -80,7 +80,7 @@ void		parse_square(t_figures **elem, char **str)
 	lst->refr_idx = stof(str);
 	in_range(lst->refr_idx, 0, INFINITY, "square");
 	lst->texture = stoi(str);
-	in_range(lst->texture, 0, 2, "square");
+	in_range(lst->texture, 0, 5, "square");
 	lst->color = parse_color(str);
 }
 
@@ -107,7 +107,7 @@ void		parse_triangle(t_figures **elem, char **str)
 	lst->refr_idx = stof(str);
 	in_range(lst->refr_idx, 0, INFINITY, "triangle");
 	lst->texture = stoi(str);
-	in_range(lst->texture, 0, 2, "triangle");
+	in_range(lst->texture, 0, 5, "triangle");
 	lst->color = parse_color(str);
 }
 
@@ -134,6 +134,6 @@ void		parse_cylinder(t_figures **elem, char **str)
 	lst->refr_idx = stof(str);
 	in_range(lst->refr_idx, 0, INFINITY, "cylinder");
 	lst->texture = stoi(str);
-	in_range(lst->texture, 0, 2, "cylinder");
+	in_range(lst->texture, 0, 5, "cylinder");
 	lst->color = parse_color(str);
 }

@@ -339,6 +339,8 @@ int					average_supersampled_color(int *color);
 
 t_p3				reflect_ray(t_p3 ray, t_p3 normal);
 
-int					apply_t(int texture, t_inter inter);
+void				apply_texture(int texture, t_inter *inter);
+
+int					rainbow(t_inter *inter);
 
 #endif

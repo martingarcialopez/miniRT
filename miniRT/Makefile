@@ -19,6 +19,7 @@ FILES	=	minirt.c \
 			bmp_exporter.c \
 			color_operations.c \
 			procedural_textures.c \
+			rainbow.c \
 			error_handling.c \
 			parsing_utils.c \
 			parsing_utils2.c \
@@ -34,7 +35,7 @@ CC		= gcc -g
 
 RM		= rm -f
 
-CFLAGS	= -Wall -Wextra -Werror -I $(HEAD)
+CFLAGS	= -Wall -Wextra -I $(HEAD)
 
 FLAGS = -L $(LIB)libft -lft -L $(LIB)libvector -lvct
 

@@ -18,6 +18,8 @@ t_p3			vadd(t_p3 a, t_p3 b);
 
 t_p3			vsubstract(t_p3 a, t_p3 b);
 
+t_p3			vproduct(t_p3 a, t_p3 b);
+
 double			dot(t_p3 a, t_p3 b);
 
 t_p3			cross(t_p3 a, t_p3 b);

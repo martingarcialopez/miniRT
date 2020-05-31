@@ -31,7 +31,7 @@ int			trace_ray(t_p3 o, t_p3 d, t_wrapper *w, int depth)
 	inter.p = vadd(o, scal_x_vec(closest_intersection, d));
 	calc_normal(inter.p, d, &(inter.normal), cl_fig);
 	inter.color = cl_fig.flag != -1 ? cl_fig.color : w->data.bgr;
-	inter.color = cl_fig.texture ? apply_t(cl_fig.texture, inter) : inter.color;
+	apply_texture(cl_fig.texture, &inter);
 	compute_light(ray, &inter, w->data, w->lst);
 	r = cl_fig.flag != -1 ? cl_fig.refl_idx : 0;
 	if (r <= 0 || depth <= 0)

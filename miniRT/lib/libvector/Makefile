@@ -1,6 +1,6 @@
 NAME	= libvct.a
 
-SRCS	= vector_operations.c vector_operations2.c
+SRCS	= vector_operations.c vector_operations2.c vector_operations3.c
 
 OBJS	= ${SRCS:.c=.o}
 
