@@ -25,6 +25,8 @@ void	parse(t_minilibx *mlx, t_scene *data, t_figures **lst, char **strptr)
 		parse_camera(mlx, data, &str);
 	else if (*str == 'c' && *(str + 1) == 'y' && *(str++) && *(str++))
 		parse_cylinder(lst, &str);
+	else if (*str == 'c' && *(str + 1) == 'u' && *(str++) && *(str++))
+		parse_cube(lst, &str);
 	else if (*str == 'l' && (*(str + 1) == 32 || *(str + 1) == 9) && *(str++))
 		parse_light(&data, &str);
 	else if (*str == 's' && *(str + 1) == 'p' && *(str++) && *(str++))
@@ -33,6 +35,8 @@ void	parse(t_minilibx *mlx, t_scene *data, t_figures **lst, char **strptr)
 		parse_square(lst, &str);
 	else if (*str == 'p' && *(str + 1) == 'l' && *(str++) && *(str++))
 		parse_plane(lst, &str);
+	else if (*str == 'p' && *(str + 1) == 'y' && *(str++) && *(str++))
+		parse_pyramid(lst, &str);
 	else if (*str == 't' && *(str + 1) == 'r' && *(str++) && *(str++))
 		parse_triangle(lst, &str);
 	*strptr = str;

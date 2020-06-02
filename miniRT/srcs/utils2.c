@@ -29,6 +29,10 @@ void		try_all_intersections(t_v3 ray, t_figures *lst,
 			intersection_distance = square_intersection(ray.o, ray.d, lst);
 		else if (lst->flag == CY)
 			intersection_distance = cylinder_intersection(ray.o, ray.d, lst);
+		else if (lst->flag == CU)
+			intersection_distance = cube_intersection(ray.o, ray.d, lst);
+		else if (lst->flag == PY)
+			intersection_distance = pyramid_intersection(ray.o, ray.d, lst);
 		if (intersection_distance > EPSILON &&
 			intersection_distance < *closest_intersection)
 		{
@@ -83,10 +87,12 @@ int			solve_cylinder(double x[2], t_p3 o, t_p3 d, t_figures *lst)
 	c = dot(u, u) - pow(lst->fig.cy.r, 2);
 	x[0] = (-b + sqrt(pow(b, 2) - 4 * a * c)) / (2 * a);
 	x[1] = (-b - sqrt(pow(b, 2) - 4 * a * c)) / (2 * a);
-	if (x[0] != x[0] && x[1] != x[1])
+	if ((x[0] != x[0] && x[1] != x[1]) || (x[0] < EPSILON && x[1] < EPSILON))
+	{
+		x[0] = INFINITY;
+		x[1] = INFINITY;
 		return (0);
-	if (x[0] < EPSILON && x[1] < EPSILON)
-		return (0);
+	}
 	return (1);
 }
 
@@ -117,3 +123,56 @@ t_p3		calc_cy_normal(double x2[2], t_p3 o, t_p3 d, t_figures *lst)
 	return (normalize(vsubstract(vsubstract(scal_x_vec(x, d),
 			scal_x_vec(dist, lst->fig.cy.nv)), vsubstract(lst->fig.cy.c, o))));
 }
+
+double		caps_intersection(t_p3 o, t_p3 d, t_figures *lst)
+{
+	double	id1;
+	double	id2;
+	t_p3	ip1;
+	t_p3	ip2;
+	t_p3	c2;
+
+	c2 = vadd(lst->fig.cy.c, scal_x_vec(lst->fig.cy.h, lst->fig.cy.nv));
+	id1 = pl_intersection(o, d, lst->fig.cy.c, lst->fig.cy.nv);
+	id2 = pl_intersection(o, d, c2, lst->fig.cy.nv);
+	if (id1 < INFINITY && id2 < INFINITY)
+	{
+		ip1 = vadd(o, scal_x_vec(id1, d));
+		ip2 = vadd(o, scal_x_vec(id2, d));
+		if ((distance(ip1, lst->fig.cy.c) <= lst->fig.cy.r) && (distance(ip2, c2) <= lst->fig.cy.r))
+			return (id1 < id2 ? id1 : id2);
+		else if (distance(ip1, lst->fig.cy.c) <= lst->fig.cy.r)
+			return (id1);
+		else if (distance(ip2, c2) <= lst->fig.cy.r)
+			return (id2);
+		return (INFINITY);
+	}
+	else if (id1 < INFINITY)
+	{
+		ip1 = vadd(o, scal_x_vec(id1, d));
+		if (distance(ip1, lst->fig.cy.c) <= lst->fig.cy.r)
+			return (id1);
+		return (INFINITY);
+	}
+	else if (id2 < INFINITY)
+	{
+		ip2 = vadd(o, scal_x_vec(id2, d));
+		if (distance(ip2, c2) <= lst->fig.cy.r)
+			return (id2);
+		return (INFINITY);
+	}
+	return (INFINITY);
+	if (distance(ip1, lst->fig.cy.c) <= lst->fig.cy.r)
+		return (id1);
+	return (INFINITY);
+}
+
+
+
+
+
+
+
+
+
+

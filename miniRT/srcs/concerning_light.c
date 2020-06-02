@@ -71,10 +71,10 @@ void	compute_light(t_v3 ray, t_inter *inter, t_scene data, t_figures *lst)
 
 void	calc_normal(t_p3 p, t_p3 d, t_p3 *normal, t_figures l)
 {
-	if ((l.flag == PL) || (l.flag == SQ) || (l.flag == TR) || (l.flag == CY))
-		*normal = vcos(d, l.normal) > 0 ? scal_x_vec(-1, l.normal) : l.normal;
-	else if (l.flag == SP)
+	if (l.flag == SP)
 		*normal = normalize(vsubstract(p, l.fig.sp.c));
+	else
+		*normal = vcos(d, l.normal) > 0 ? scal_x_vec(-1, l.normal) : l.normal;
 }
 
 int		is_lit(t_p3 o, t_p3 d, t_figures *lst)
@@ -93,6 +93,10 @@ int		is_lit(t_p3 o, t_p3 d, t_figures *lst)
 			in = square_intersection(o, d, lst);
 		else if (lst->flag == CY)
 			in = cylinder_intersection(o, d, lst);
+		else if (lst->flag == CU)
+			in = cube_intersection(o, d, lst);
+		else if (lst->flag == PY)
+			in = pyramid_intersection(o, d, lst);
 		if (in > EPSILON && in < 1)
 			return (0);
 		lst = lst->next;

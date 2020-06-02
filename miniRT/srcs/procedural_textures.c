@@ -22,8 +22,7 @@ t_p3		x_axis_rotation(t_p3 vec, double angle)
 
 	rad_angle = angle * M_PI / 180;
 	row1 = (t_p3){1, 0, 0};
-	row2 = (t_p3){0, cos(rad_angle), -sin(rad_angle)};
-	row3 = (t_p3){0, sin(rad_angle), cos(rad_angle)};
+	row2 = (t_p3){0, cos(rad_angle), -sin(rad_angle)}; row3 = (t_p3){0, sin(rad_angle), cos(rad_angle)};
 	rotated.x = vec.x * row1.x + vec.y * row1.y + vec.z * row1.z;
 	rotated.y = vec.x * row2.x + vec.y * row2.y + vec.z * row2.z;
 	rotated.z = vec.x * row3.x + vec.y * row3.y + vec.z * row3.z;
@@ -91,8 +90,8 @@ static t_p3	sinwave(t_inter *inter)
 	double	sinn;
 	double	scal;
 
-	scal = 10;
-	sinn = sin(inter->p.z * scal) + sin(inter->p.x * scal) + sin(inter->p.y * scal);
+	scal = 0.30;
+	sinn = sin(inter->p.z * scal) /*+ sin(inter->p.x * scal)*/ + sin(inter->p.y * scal);
 	return (x_axis_rotation(inter->normal, sinn));
 }
 

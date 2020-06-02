@@ -82,11 +82,12 @@ void		write_header(int fd, t_bmphead header, t_dibhead dib)
 
 void		write_file(int fd, t_scene data, t_minilibx mlx)
 {
-	char	pixel_array[mlx.cam->size_line * data.yres];
+	char	*pixel_array;//[mlx.cam->size_line * data.yres];
 	int		image_size;
 	int		i;
 	int		j;
 
+	pixel_array = (char *)ec_malloc(mlx.cam->size_line * data.yres);
 	image_size = data.xres * data.yres;
 	i = 0;
 	j = 0;

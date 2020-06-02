@@ -34,7 +34,7 @@
 
 # define BUFSIZE	32
 
-# define NUM_THREADS 4
+# define NUM_THREADS 2
 
 # define REFLECTION_LIMIT 3
 
@@ -43,6 +43,8 @@
 # define SQ 2
 # define TR 3
 # define CY 4
+# define CU 5
+# define PY 6
 
 # define EPSILON 0.00001
 # define CREATE_FLAGS O_WRONLY | O_CREAT | O_TRUNC, S_IRUSR | S_IWUSR
@@ -199,6 +201,10 @@ void				parse_triangle(t_figures **elem, char **str);
 
 void				parse_cylinder(t_figures **elem, char **str);
 
+void				parse_cube(t_figures **elem, char **str);
+
+void				parse_pyramid(t_figures **elem, char **str);
+
 /*
 **				Parsing help functions
 */
@@ -236,6 +242,10 @@ double				square_intersection(t_p3 o, t_p3 d, t_figures *lst);
 double				triangle_intersection(t_p3 o, t_p3 d, t_figures *lst);
 
 double				cylinder_intersection(t_p3 o, t_p3 d, t_figures *lst);
+
+double				cube_intersection(t_p3 o, t_p3 d, t_figures *lst);
+
+double				pyramid_intersection(t_p3 o, t_p3 d, t_figures *lst);
 
 /*
 **				Intersections help functions
@@ -342,5 +352,7 @@ t_p3				reflect_ray(t_p3 ray, t_p3 normal);
 void				apply_texture(int texture, t_inter *inter);
 
 int					rainbow(t_inter *inter);
+
+double				caps_intersection(t_p3 o, t_p3 d, t_figures *lst);
 
 #endif
