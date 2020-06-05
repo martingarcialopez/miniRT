@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   vector_operations3.c                               :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: mgarcia- <mgarcia-@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2020/06/05 20:44:32 by mgarcia-          #+#    #+#             */
+/*   Updated: 2020/06/05 20:44:34 by mgarcia-         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "libvct.h"
 
 double		distance(t_p3 p1, t_p3 p2)
@@ -44,7 +56,7 @@ t_p3		y_axis_rotation(t_p3 vec, double angle)
 	return (rotated);
 }
 
-t_p3	z_axis_rotation(t_p3 vec, double angle)
+t_p3		z_axis_rotation(t_p3 vec, double angle)
 {
 	t_p3	row1;
 	t_p3	row2;

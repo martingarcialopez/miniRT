@@ -54,6 +54,5 @@ t_p3		cross(t_p3 a, t_p3 b)
 	cp.x = a.y * b.z - a.z * b.y;
 	cp.y = a.z * b.x - a.x * b.z;
 	cp.z = a.x * b.y - a.y * b.x;
-
 	return (cp);
 }
