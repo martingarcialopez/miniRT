@@ -71,4 +71,5 @@ void	parse_scene(t_minilibx *mlx, t_scene *data, t_figures **lst, char **av)
 		fatal("while opening file");
 	str = readfile(str, fd);
 	parse_elems(mlx, data, lst, str);
+	free(str);
 }

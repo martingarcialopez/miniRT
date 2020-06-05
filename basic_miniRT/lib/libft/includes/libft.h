@@ -22,7 +22,7 @@ typedef struct		s_list
 	struct s_list	*next;
 }					t_list;
 
-int					ft_printf(const char *format, ...) __attribute__((format(printf,1,2)));
+int					ft_printf(const char *format, ...);
 
 int					ft_atoi(const char *str);
 
