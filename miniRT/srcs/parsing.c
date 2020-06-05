@@ -12,9 +12,18 @@
 
 #include "minirt.h"
 
-void	parse(t_minilibx *mlx, t_scene *data, t_figures **lst, char **strptr)
+static void		parse2(t_figures **lst, char *str)
 {
-	char	*str;
+	if (*str == 'p' && *(str + 1) == 'y' && *(str++) && *(str++))
+		parse_pyramid(lst, &str);
+	else if (*str == 't' && *(str + 1) == 'r' && *(str++) && *(str++))
+		parse_triangle(lst, &str);
+}
+
+static void		parse(t_minilibx *mlx, t_scene *data, t_figures **lst,
+																char **strptr)
+{
+	char *str;
 
 	str = *strptr;
 	if (*str == 'R' && *(str++))
@@ -35,14 +44,12 @@ void	parse(t_minilibx *mlx, t_scene *data, t_figures **lst, char **strptr)
 		parse_square(lst, &str);
 	else if (*str == 'p' && *(str + 1) == 'l' && *(str++) && *(str++))
 		parse_plane(lst, &str);
-	else if (*str == 'p' && *(str + 1) == 'y' && *(str++) && *(str++))
-		parse_pyramid(lst, &str);
-	else if (*str == 't' && *(str + 1) == 'r' && *(str++) && *(str++))
-		parse_triangle(lst, &str);
+	parse2(lst, str);
 	*strptr = str;
 }
 
-void	parse_elems(t_minilibx *mlx, t_scene *data, t_figures **lst, char *str)
+static void		parse_elems(t_minilibx *mlx, t_scene *data, t_figures **lst,
+																	char *str)
 {
 	data->res_init = 0;
 	data->al_init = 0;
@@ -61,7 +68,8 @@ void	parse_elems(t_minilibx *mlx, t_scene *data, t_figures **lst, char *str)
 		scene_error("Not enough elements to render a scene\n");
 }
 
-void	parse_scene(t_minilibx *mlx, t_scene *data, t_figures **lst, char **av)
+void			parse_scene(t_minilibx *mlx, t_scene *data, t_figures **lst,
+																	char **av)
 {
 	char		*str;
 	int			fd;
@@ -75,4 +83,5 @@ void	parse_scene(t_minilibx *mlx, t_scene *data, t_figures **lst, char **av)
 		fatal("while opening file");
 	str = readfile(str, fd);
 	parse_elems(mlx, data, lst, str);
+	free(str);
 }

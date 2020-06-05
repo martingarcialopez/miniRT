@@ -38,11 +38,7 @@ void			multithreaded_render(t_wrapper wrapper[NUM_THREADS])
 	}
 	i = 0;
 	while (i < NUM_THREADS)
-	{
-		if (i > 0)
-			ft_printf("waiting thread %d to finish...\n", i + 1);
 		pthread_join(threads[i++], NULL);
-	}
 }
 
 void			wrapp_data(t_minilibx mlx, t_scene data, t_figures *lst,

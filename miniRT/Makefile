@@ -10,9 +10,13 @@ FILES	=	minirt.c \
 			parsing.c \
 			parse_info.c \
 			parse_elements.c \
+			parse_compound_elements.c \
 			multithreading.c \
 			camera.c \
-			intersections.c \
+			sphere_intersection.c \
+			plane_intersection.c \
+			cylinder_intersection.c \
+			compound_intersections.c \
 			concerning_light.c \
 			sample_pixel.c \
 			supersampling.c \
@@ -25,7 +29,6 @@ FILES	=	minirt.c \
 			parsing_utils2.c \
 			utils.c \
 			utils2.c \
-			utils3.c \
 
 SRCS	= $(addprefix $(SRCDIR), $(FILES))
 

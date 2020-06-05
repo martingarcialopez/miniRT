@@ -78,12 +78,12 @@ char		*readfile(char *str, int fd)
 void		obj_to_rt(char *str, int fd, int vertex)
 {
 	struct p3	tab[vertex + 1];
-	char		color[12];
+	char		color[20];
 	int			idx;
 	int			i = 1;
 	int			j;
 
-	strcpy(color, "205,109,90");
+	strcpy(color, "0 0 0 0 255,128,0");
 	while (*str)
 	{
 		if (*str == 'v' && *(str + 1) == ' ')

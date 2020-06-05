@@ -12,6 +12,29 @@
 
 #include "minirt.h"
 
+t_p3		refract_ray(t_p3 d, t_p3 normal, t_figures *lst)
+{
+	double	cosi;
+	double	etai;
+	double	etat;
+	double	eta;
+	double	k;
+
+	cosi = dot(d, normal);
+	etai = 1;
+	etat = lst->refr_idx;
+	if (lst->fig.sp.inside == 1)
+	{
+		k = etai;
+		etai = etat;
+		etat = k;
+	}
+	eta = etai / etat;
+	k = 1 - eta * eta * (1 - cosi * cosi);
+	return (k < 0 ? reflect_ray(scal_x_vec(-1, d), normal)
+		: vadd(scal_x_vec(eta, d), scal_x_vec(eta * cosi - sqrt(k), normal)));
+}
+
 int			trace_ray(t_p3 o, t_p3 d, t_wrapper *w, int depth)
 {
 	t_v3		ray;
@@ -22,22 +45,22 @@ int			trace_ray(t_p3 o, t_p3 d, t_wrapper *w, int depth)
 
 	ray.o = o;
 	ray.d = d;
-	inter.color = 0x000000;
-	inter.ref_color = 0x000000;
-	w->data.bgr = 0x202020;
 	closest_intersection = INFINITY;
 	cl_fig.flag = -1;
 	try_all_intersections(ray, w->lst, &cl_fig, &closest_intersection);
 	inter.p = vadd(o, scal_x_vec(closest_intersection, d));
-	calc_normal(inter.p, d, &(inter.normal), cl_fig);
+	calc_normal(inter.p, d, &(inter.normal), &cl_fig);
 	inter.color = cl_fig.flag != -1 ? cl_fig.color : w->data.bgr;
-	apply_texture(cl_fig.texture, &inter);
+	apply_texture(cl_fig.texture, &inter, w->lst);
 	compute_light(ray, &inter, w->data, w->lst);
 	r = cl_fig.flag != -1 ? cl_fig.refl_idx : 0;
-	if (r <= 0 || depth <= 0)
-		return (inter.color);
-	inter.ref_vec = reflect_ray(scal_x_vec(-1, d), inter.normal);
-	inter.ref_color = trace_ray(inter.p, inter.ref_vec, w, depth - 1);
+	cl_fig.refr_idx = cl_fig.flag != -1 ? cl_fig.refr_idx : 0;
+	if (cl_fig.refr_idx > 0)
+		inter.color = trace_ray(inter.p,
+				refract_ray(d, inter.normal, &cl_fig), w, depth);
+	if (r > 0 && depth > 0)
+		inter.ref_color = trace_ray(inter.p,
+				reflect_ray(scal_x_vec(-1, d), inter.normal), w, depth - 1);
 	return (cadd(cproduct(inter.color, 1 - r), cproduct(inter.ref_color, r)));
 }
 
@@ -51,6 +74,7 @@ int			calc_pixel_color(int *edge_color, int last[2], t_wrapper *w)
 	rss.yres = w->data.yres;
 	rss.i = w->i;
 	rss.j = w->j;
+	w->data.bgr = 0x202020;
 	color = sample_pixel(edge_color, last, rss, w);
 	if (color_difference(color[0], color[3])
 		|| color_difference(color[1], color[2]))
@@ -76,12 +100,12 @@ void		render_scene(t_wrapper *w)
 			w->mlx.cam->px_img[w->j * w->data.xres + w->i] = color;
 			w->i++;
 		}
-		if (w->tid == 0)
+		if (w->tid == NUM_THREADS - 1)
 			ft_printf("\rRendering scene... (cam %d/%d) [%d%%]",
-			w->mlx.cam->idx, w->data.cam_nb, 100 * w->j / (n * (w->tid + 1)));
+			w->mlx.cam->idx, w->data.cam_nb, 100 * (w->j % n) / n);
 		w->j++;
 	}
-	if (w->tid == 0)
+	if (w->tid == NUM_THREADS - 1)
 		ft_printf("\rRendering scene... (cam %d/%d) [100%%]\n",
 											w->mlx.cam->idx, w->data.cam_nb);
 }

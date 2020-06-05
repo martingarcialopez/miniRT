@@ -12,13 +12,11 @@
 
 #include "minirt.h"
 
-int			create_file(char *name)
+int			create_file(char *name, int i, int j)
 {
 	char	*bmpname;
 	int		path;
 	int		fd;
-	int		i;
-	int		j;
 
 	path = 0;
 	bmpname = (char *)ec_malloc(ft_strlen(name) + 8);
@@ -38,6 +36,7 @@ int			create_file(char *name)
 	ft_strcat(bmpname, ".bmp");
 	if (!((fd = open(bmpname, CREATE_FLAGS)) > 0))
 		fatal("in do_the_bmp_thing() while creating file");
+	free(bmpname);
 	return (fd);
 }
 
@@ -82,7 +81,7 @@ void		write_header(int fd, t_bmphead header, t_dibhead dib)
 
 void		write_file(int fd, t_scene data, t_minilibx mlx)
 {
-	char	*pixel_array;//[mlx.cam->size_line * data.yres];
+	char	*pixel_array;
 	int		image_size;
 	int		i;
 	int		j;
@@ -100,6 +99,7 @@ void		write_file(int fd, t_scene data, t_minilibx mlx)
 		i++;
 	}
 	write(fd, pixel_array, mlx.cam->size_line * data.yres);
+	free(pixel_array);
 }
 
 void		do_the_bmp_thing(t_minilibx mlx, t_scene data, char *name)
@@ -107,8 +107,12 @@ void		do_the_bmp_thing(t_minilibx mlx, t_scene data, char *name)
 	t_bmphead	header;
 	t_dibhead	dib;
 	int			fd;
+	int			i;
+	int			j;
 
-	fd = create_file(name);
+	i = 0;
+	j = 0;
+	fd = create_file(name, i, j);
 	create_header(data, &header, &dib);
 	write_header(fd, header, dib);
 	write_file(fd, data, mlx);

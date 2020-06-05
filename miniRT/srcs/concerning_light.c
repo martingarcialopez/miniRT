@@ -69,12 +69,22 @@ void	compute_light(t_v3 ray, t_inter *inter, t_scene data, t_figures *lst)
 	inter->color = color_x_light(inter->color, rgb);
 }
 
-void	calc_normal(t_p3 p, t_p3 d, t_p3 *normal, t_figures l)
+void	calc_normal(t_p3 p, t_p3 d, t_p3 *normal, t_figures *l)
 {
-	if (l.flag == SP)
-		*normal = normalize(vsubstract(p, l.fig.sp.c));
+	if (l->flag == SP)
+	{
+		*normal = normalize(vsubstract(p, l->fig.sp.c));
+		if (vcos(d, *normal) > 0)
+		{
+			*normal = scal_x_vec(-1, *normal);
+			l->fig.sp.inside = 1;
+		}
+		else
+			l->fig.sp.inside = 0;
+	}
 	else
-		*normal = vcos(d, l.normal) > 0 ? scal_x_vec(-1, l.normal) : l.normal;
+		*normal = vcos(d, l->normal) > 0 ? scal_x_vec(-1, l->normal)
+											: l->normal;
 }
 
 int		is_lit(t_p3 o, t_p3 d, t_figures *lst)

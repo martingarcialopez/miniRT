@@ -44,7 +44,7 @@ static t_p3		look_at(t_p3 d, t_p3 cam_nv)
 	tmp = vdefine(0, 1, 0);
 	z_axis = cam_nv;
 	if (cam_nv.y == 1 || cam_nv.y == -1)
-		x_axis = cam_nv.y == 1 ? vdefine(1, 0, 0) : vdefine(-1, 0, 0);
+		x_axis = cam_nv.y == 1 ? (t_p3) {1, 0, 0} : (t_p3) {-1, 0, 0};
 	else
 		x_axis = cross(tmp, z_axis);
 	y_axis = cross(z_axis, x_axis);

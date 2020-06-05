@@ -54,7 +54,7 @@ void		init_mlx(t_minilibx *mlx, t_scene *data)
 		data->yres = data->yres < y_displayres ? data->yres : y_displayres;
 	}
 	mlx->win_ptr = mlx_new_window(mlx->mlx_ptr, data->xres, data->yres,
-															"basic miniRT");
+															"miniRT");
 	cam_begin = mlx->cam;
 	mlx->begin = mlx->cam;
 	while (mlx->cam)

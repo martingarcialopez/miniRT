@@ -32,7 +32,7 @@
 #  define OS_NAME 2
 # endif
 
-# define BUFSIZE	32
+# define BUFSIZE 32
 
 # define NUM_THREADS 2
 
@@ -54,13 +54,6 @@ typedef struct		s_v3
 	t_p3	o;
 	t_p3	d;
 }					t_v3;
-
-typedef struct		s_sq
-{
-	t_p3	half_size;
-	t_p3	floor;
-	t_p3	center_to_ip;
-}					t_sq;
 
 typedef struct		s_camera
 {
@@ -108,6 +101,7 @@ typedef struct		s_figures
 	double			refr_idx;
 	int				texture;
 	t_p3			normal;
+	double			wavelength;
 	struct s_figures*next;
 }					t_figures;
 
@@ -176,6 +170,29 @@ typedef struct		s_thread
 	int				i;
 }					t_thread;
 
+typedef struct		s_sq
+{
+	t_p3	half_size;
+	t_p3	floor;
+	t_p3	center_to_ip;
+}					t_sq;
+
+typedef struct	s_cube
+{
+	t_figures	sq;
+	t_p3		center;
+	t_p3		normal[6];
+}				t_cube;
+
+typedef struct s_pyramid
+{
+	t_figures	sq;
+	t_figures	tr;
+	t_p3		tr_center;
+	t_p3		normal[5];
+	t_p3		corner[4];
+}				t_pyr;
+
 /*
 **			 	Parsing functions
 */
@@ -232,9 +249,6 @@ void				ft_addnewlst_back(t_figures **alst);
 */
 double				sphere_intersection(t_p3 o, t_p3 d, t_figures *lst);
 
-double				pl_intersection(t_p3 o, t_p3 d, t_p3 plane_p,
-														t_p3 plane_nv);
-
 double				plane_intersection(t_p3 o, t_p3 d, t_figures *lst);
 
 double				square_intersection(t_p3 o, t_p3 d, t_figures *lst);
@@ -254,11 +268,8 @@ double				pyramid_intersection(t_p3 o, t_p3 d, t_figures *lst);
 void				try_all_intersections(t_v3 ray, t_figures *lst,
 											t_figures *clfig, double *clint);
 
-int					p_is_outside(t_p3 p1, t_p3 p2, t_p3 p3, t_p3 ip);
-
-int					solve_cylinder(double x[2], t_p3 o, t_p3 d, t_figures *lst);
-
-t_p3				calc_cy_normal(double x2[2], t_p3 o, t_p3 d, t_figures *l);
+double				solve_plane(t_p3 o, t_p3 d, t_p3 plane_p,
+														t_p3 plane_nv);
 
 /*
 **				Ray tracing
@@ -270,7 +281,7 @@ int					trace_ray(t_p3 o, t_p3 d, t_wrapper *w, int depth);
 
 int					calc_ray(int n, t_rss rss, t_wrapper *w);
 
-void				calc_normal(t_p3 p, t_p3 d, t_p3 *normal, t_figures lst);
+void				calc_normal(t_p3 p, t_p3 d, t_p3 *normal, t_figures *lst);
 
 int					is_lit(t_p3 o, t_p3 d, t_figures *lst);
 
@@ -349,10 +360,8 @@ int					average_supersampled_color(int *color);
 
 t_p3				reflect_ray(t_p3 ray, t_p3 normal);
 
-void				apply_texture(int texture, t_inter *inter);
+void				apply_texture(int texture, t_inter *inter, t_figures *lst);
 
 int					rainbow(t_inter *inter);
-
-double				caps_intersection(t_p3 o, t_p3 d, t_figures *lst);
 
 #endif

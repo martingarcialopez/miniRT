@@ -36,4 +36,10 @@ t_p3			scal_x_vec(double n, t_p3 p);
 
 double			distance(t_p3 p1, t_p3 p2);
 
+t_p3			x_axis_rotation(t_p3 vec, double angle);
+
+t_p3			y_axis_rotation(t_p3 vec, double angle);
+
+t_p3			z_axis_rotation(t_p3 vec, double angle);
+
 #endif

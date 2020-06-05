@@ -19,6 +19,7 @@ typedef struct	s_sphere
 {
 	t_p3	c;
 	double	r;
+	int		inside;
 }				t_sphere;
 
 typedef struct	s_plane
@@ -50,12 +51,6 @@ typedef struct	s_triangle
 	t_p3	p3;
 }				t_triangle;
 
-typedef struct	s_cube
-{
-	t_p3	c;
-	double	side;
-}				t_cube;
-
 union			u_figures
 {
 	t_sphere	sp;
@@ -63,7 +58,6 @@ union			u_figures
 	t_square	sq;
 	t_cylinder	cy;
 	t_triangle	tr;
-	t_cube		cu;
 };
 
 #endif
