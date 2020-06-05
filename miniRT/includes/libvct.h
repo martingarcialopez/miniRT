@@ -1,7 +1,17 @@
-/*			HEADEERRR BTCH							*/
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   libvct.h                                           :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: mgarcia- <mgarcia-@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2020/06/05 19:29:34 by mgarcia-          #+#    #+#             */
+/*   Updated: 2020/06/05 19:31:49 by mgarcia-         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
 
-#ifndef LIBVCT
-# define LIBVCT
+#ifndef LIBVCT_H
+# define LIBVCT_H
 
 # include <math.h>
 
@@ -9,7 +19,7 @@ typedef struct	s_p3
 {
 	double		x;
 	double		y;
-	double 		z;
+	double		z;
 }				t_p3;
 
 t_p3			vdefine(double x, double y, double z);

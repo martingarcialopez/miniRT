@@ -6,7 +6,7 @@
 /*   By: mgarcia- <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/01/20 08:42:41 by mgarcia-          #+#    #+#             */
-/*   Updated: 2020/05/30 19:16:05 by mgarcia-         ###   ########.fr       */
+/*   Updated: 2020/06/05 19:32:56 by mgarcia-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,7 +47,6 @@
 # define PY 6
 
 # define EPSILON 0.00001
-# define CREATE_FLAGS O_WRONLY | O_CREAT | O_TRUNC, S_IRUSR | S_IWUSR
 
 typedef struct		s_v3
 {
@@ -172,26 +171,26 @@ typedef struct		s_thread
 
 typedef struct		s_sq
 {
-	t_p3	half_size;
-	t_p3	floor;
-	t_p3	center_to_ip;
+	t_p3			half_size;
+	t_p3			floor;
+	t_p3			center_to_ip;
 }					t_sq;
 
-typedef struct	s_cube
+typedef struct		s_cube
 {
-	t_figures	sq;
-	t_p3		center;
-	t_p3		normal[6];
-}				t_cube;
+	t_figures		sq;
+	t_p3			center;
+	t_p3			normal[6];
+}					t_cube;
 
-typedef struct s_pyramid
+typedef struct		s_pyramid
 {
-	t_figures	sq;
-	t_figures	tr;
-	t_p3		tr_center;
-	t_p3		normal[5];
-	t_p3		corner[4];
-}				t_pyr;
+	t_figures		sq;
+	t_figures		tr;
+	t_p3			tr_center;
+	t_p3			normal[5];
+	t_p3			corner[4];
+}					t_pyr;
 
 /*
 **			 	Parsing functions

@@ -6,23 +6,20 @@
 /*   By: mgarcia- <mgarcia-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/05/15 13:06:26 by mgarcia-          #+#    #+#             */
-/*   Updated: 2020/05/15 13:06:30 by mgarcia-         ###   ########.fr       */
+/*   Updated: 2020/06/05 19:36:40 by mgarcia-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minirt.h"
 
-int			create_file(char *name)
+int			create_file(char *name, int i, int j)
 {
 	char	*bmpname;
 	int		path;
 	int		fd;
-	int		i;
-	int		j;
 
 	path = 0;
 	bmpname = (char *)ec_malloc(ft_strlen(name) + 8);
-	i = 0;
 	while (name[i])
 		if (name[i++] == '/')
 			path++;
@@ -36,8 +33,10 @@ int			create_file(char *name)
 		bmpname[j++] = name[i++];
 	bmpname[j] = '\0';
 	ft_strcat(bmpname, ".bmp");
-	if (!((fd = open(bmpname, FILE_CREATE_FLAGS)) > 0))
+	if (!((fd = open(bmpname, O_WRONLY | O_CREAT | O_TRUNC,
+													S_IRUSR | S_IWUSR)) > 0))
 		fatal("in do_the_bmp_thing() while creating file");
+	free(bmpname);
 	return (fd);
 }
 
@@ -106,8 +105,12 @@ void		do_the_bmp_thing(t_minilibx mlx, t_scene data, char *name)
 	t_bmphead	header;
 	t_dibhead	dib;
 	int			fd;
+	int			i;
+	int			j;
 
-	fd = create_file(name);
+	i = 0;
+	j = 0;
+	fd = create_file(name, i, j);
 	create_header(data, &header, &dib);
 	write_header(fd, header, dib);
 	write_file(fd, data, mlx);
