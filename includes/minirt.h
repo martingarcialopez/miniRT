@@ -327,7 +327,7 @@ void				success_message(int ac);
 
 void				init_mlx(t_minilibx *mlx, t_scene *data);
 
-void				graphic_loop(t_minilibx mlx);
+void				graphic_loop(t_minilibx mlx, t_scene data);
 
 int					next_cam(int keycode, t_minilibx *mlx);
 

@@ -53,8 +53,6 @@ void		init_mlx(t_minilibx *mlx, t_scene *data)
 		data->xres = data->xres < x_displayres ? data->xres : x_displayres;
 		data->yres = data->yres < y_displayres ? data->yres : y_displayres;
 	}
-	mlx->win_ptr = mlx_new_window(mlx->mlx_ptr, data->xres, data->yres,
-															"miniRT");
 	cam_begin = mlx->cam;
 	mlx->begin = mlx->cam;
 	while (mlx->cam)
@@ -90,8 +88,10 @@ void		success_message(int ac)
 	}
 }
 
-void		graphic_loop(t_minilibx mlx)
+void		graphic_loop(t_minilibx mlx, t_scene data)
 {
+	mlx.win_ptr = mlx_new_window(mlx.mlx_ptr, data.xres, data.yres,
+															"miniRT");
 	mlx_put_image_to_window(mlx.mlx_ptr, mlx.win_ptr, mlx.cam->img_ptr, 0, 0);
 	mlx_hook(mlx.win_ptr, DESTROYNOTIFY, STRUCTURENOTIFYMASK, close_program, 0);
 	mlx_hook(mlx.win_ptr, KEYPRESS, KEYPRESSMASK, next_cam, &mlx);

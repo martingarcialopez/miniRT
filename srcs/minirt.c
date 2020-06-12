@@ -128,6 +128,6 @@ int			main(int ac, char **av)
 	if (ac == 3)
 		do_the_bmp_thing(mlx, data, av[1]);
 	success_message(ac);
-	graphic_loop(mlx);
+	graphic_loop(mlx, data);
 	return (0);
 }
