@@ -1,5 +1,7 @@
 # miniRT
 
+A school project for 42Paris. The subject -> [miniRT_subject](https://cdn.intra.42.fr/pdf/pdf/10458/en.subject.pdf)
+
 A basic ray tracer using the CPU, featuring antialiasing via adaptative supersampling and a multithreaded render.
 The supported primitives are spheres, planes, cylinders, squares, triangles, cubes and pyramids.
 There aren't any acceleration structures like BVH, and althought it support triangles, a proper KD-tree for polygon meshes
@@ -20,7 +22,7 @@ It will detect the number of cores of your computer and will define the number o
 
 ### Example
 
-`./miniRT scenes/cornellbox.rt`
+* `./miniRT scenes/cornellbox.rt`
 
 ![alt text](https://github.com/martingarcialopez/miniRT/blob/master/jpg/cornellbox.jpg?raw=true)
 
