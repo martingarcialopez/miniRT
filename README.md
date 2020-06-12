@@ -25,7 +25,7 @@ It will detect the number of cores of your computer and will define the number o
 `./miniRT scenes/cornellbox.rt`
 
 
-======================== &nbsp;&nbsp;&nbsp; **Some samples** (click the images for larger size) &nbsp;&nbsp;&nbsp; ========================
+======================= &nbsp;&nbsp;&nbsp; **Some samples** (click on the images for larger size) &nbsp;&nbsp;&nbsp; =======================
 
 ![alt text](https://github.com/martingarcialopez/miniRT/blob/master/jpg/cornellbox.jpg?raw=true)
 
