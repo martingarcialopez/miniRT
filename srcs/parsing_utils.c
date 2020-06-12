@@ -61,7 +61,7 @@ double		stof(char **str)
 	d = 0.0;
 	while (ft_isdigit(**str))
 		d = d * 10 + (*((*str)++) - '0');
-	while (d > 1)
+	while (d >= 1)
 		d /= 10;
 	d += w;
 	next(str);
