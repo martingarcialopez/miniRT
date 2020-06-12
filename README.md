@@ -16,9 +16,9 @@ It will detect the number of cores of your computer and will define the number o
 
 ### Usage
 
-+`./miniRT <scene.rt>` To render the .rt scene passed as a parameter
++ `./miniRT <scene.rt>` To render the .rt scene passed as a parameter
 
-+`./miniRT <scene.rt> --save` To save the .rt scene passed as a parameter to a .bmp file
++ `./miniRT <scene.rt> --save` To save the .rt scene passed as a parameter to a .bmp file
 
 ### Example
 
