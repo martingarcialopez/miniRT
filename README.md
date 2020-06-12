@@ -16,13 +16,13 @@ It will detect the number of cores of your computer and will define the number o
 
 ### Usage
 
-`./miniRT <scene.rt>` To render the .rt scene passed as a parameter
++`./miniRT <scene.rt>` To render the .rt scene passed as a parameter
 
-`./miniRT <scene.rt> --save` To save the .rt scene passed as a parameter to a .bmp file
++`./miniRT <scene.rt> --save` To save the .rt scene passed as a parameter to a .bmp file
 
 ### Example
 
-* `./miniRT scenes/cornellbox.rt`
+`./miniRT scenes/cornellbox.rt`
 
 ![alt text](https://github.com/martingarcialopez/miniRT/blob/master/jpg/cornellbox.jpg?raw=true)
 
@@ -35,3 +35,5 @@ It will detect the number of cores of your computer and will define the number o
 ![alt text](https://github.com/martingarcialopez/miniRT/blob/master/jpg/compound_figures.jpg?raw=true)
 
 ![alt text](https://github.com/martingarcialopez/miniRT/blob/master/jpg/columns.jpg?raw=true)
+
+![alt text](https://github.com/martingarcialopez/miniRT/blob/master/jpg/colored_light.jpg?raw=true)
