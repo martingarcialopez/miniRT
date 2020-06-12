@@ -38,7 +38,7 @@ CC		= gcc -g
 
 RM		= rm -f
 
-CFLAGS	= -Wall -Wextra -I $(HEAD)
+CFLAGS	= -Wall -Wextra -Werror -I $(HEAD) -D NUM_THREADS=$(NUM_THREADS)
 
 FLAGS = -L $(LIB)libft -lft -L $(LIB)libvector -lvct
 
@@ -53,10 +53,12 @@ LINUX_FLAGS = -L $(LIB)minilibx-linux -lmlx -lm -lX11 -lXext -lpthread
 UNAME := $(shell uname)
 
 ifeq ($(UNAME),Darwin)
+	NUM_THREADS = $(shell sysctl -n hw.ncpu)
 	CFLAGS += $(MACOS_MACRO)
 	FLAGS += $(MACOS_FLAGS)
 endif
 ifeq ($(UNAME),Linux)
+	NUM_THREADS = $(shell nproc --all)
 	CFLAGS += $(LINUX_MACRO)
 	FLAGS += $(LINUX_FLAGS)
 endif

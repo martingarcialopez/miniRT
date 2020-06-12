@@ -34,7 +34,9 @@
 
 # define BUFSIZE 32
 
-# define NUM_THREADS 4
+# ifndef NUM_THREADS
+#  define NUM_THREADS 4
+# endif
 
 # define REFLECTION_LIMIT 3
 

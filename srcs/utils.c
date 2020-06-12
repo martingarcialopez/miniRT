@@ -69,10 +69,17 @@ void		init_mlx(t_minilibx *mlx, t_scene *data)
 
 void		success_message(int ac)
 {
+	int		t;
+
+	t = NUM_THREADS;
 	if (ac == 2)
 	{
-		ft_printf("\nScene successfully rendered, press ESC at any moment ");
-		ft_printf("to close the program.\nIf the scene has several cameras, ");
+		if (NUM_THREADS == 1)
+			ft_printf("\nScene successfully rendered with 1 thread, ");
+		else
+			ft_printf("\nScene successfully rendered with %d threads, ", t);
+		ft_printf("press ESC at any momnet to close the program.\n");
+		ft_printf("If the scene has several cameras, ");
 		ft_printf("press space to change between them\n\n");
 	}
 	else
