@@ -48,9 +48,9 @@ static t_p3		look_at(t_p3 d, t_p3 cam_nv)
 	else
 		x_axis = cross(tmp, z_axis);
 	y_axis = cross(z_axis, x_axis);
-	rotated.x = d.x * x_axis.x + d.y * x_axis.y + d.z * x_axis.z;
-	rotated.y = d.x * y_axis.x + d.y * y_axis.y + d.z * y_axis.z;
-	rotated.z = d.x * z_axis.x + d.y * z_axis.y + d.z * z_axis.z;
+	rotated.x = d.x * x_axis.x + d.y * y_axis.x + d.z * z_axis.x;
+	rotated.y = d.x * x_axis.y + d.y * y_axis.y + d.z * z_axis.y;
+	rotated.z = d.x * x_axis.z + d.y * y_axis.z + d.z * z_axis.z;
 	return (rotated);
 }
 
